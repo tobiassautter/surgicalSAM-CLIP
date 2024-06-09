@@ -45,3 +45,4 @@ ckp/
 work_dirs/
 /data
 /ENV_SAM
+ENV/
