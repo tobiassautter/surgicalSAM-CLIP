@@ -71,11 +71,15 @@ print("======> Load SAM")
 sam_checkpoint = "../ckp/sam/sam_vit_h_4b8939.pth"
 # print checkpoint
 print(f"checkpoint: {sam_checkpoint}")
+# try loading the model
+try:
+    model_type = "vit_h_no_image_encoder"
+    sam_prompt_encoder, sam_decoder = sam_model_registry[model_type](
+        checkpoint=sam_checkpoint
+    )
+except KeyError:
+    raise ValueError(f"Unknown model type: {model_type}")
 
-model_type = "vit_h_no_image_encoder"
-sam_prompt_encoder, sam_decoder = sam_model_registry[model_type](
-    checkpoint=sam_checkpoint
-)
 sam_prompt_encoder.cuda()
 sam_decoder.cuda()
 
