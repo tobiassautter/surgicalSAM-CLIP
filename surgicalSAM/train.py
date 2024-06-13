@@ -23,6 +23,10 @@ from loss import DiceLoss
 from pytorch_metric_learning import losses
 from datetime import datetime
 
+# Exponantial LR 
+from torch.optim.lr_scheduler import ExponentialLR
+
+
 print("======> Process Arguments")
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -45,9 +49,9 @@ print("======> Set Parameters for Training")
 dataset_name = args.dataset
 fold = args.fold
 thr = 0
-seed = 69  # 666
+seed = 666  # 666
 data_root_dir = f"../data/{dataset_name}"
-batch_size = 24  # 32
+batch_size = 32
 vit_mode = "h"
 
 # set seed for reproducibility
@@ -66,8 +70,8 @@ if "18" in dataset_name:
     )
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
-    num_epochs = 100  # 500
-    lr = 0.0025  # 0.001
+    num_epochs = 200  # 500
+    lr = 0.005  # 0.001
     save_dir = "./work_dirs/endovis_2018/"
 
 elif "17" in dataset_name:
@@ -90,10 +94,14 @@ val_dataloader = DataLoader(
 print("======> Load SAM")
 if vit_mode == "h":
     sam_checkpoint = "../ckp/sam/sam_vit_h_4b8939.pth"
+    
 model_type = "vit_h_no_image_encoder"
+
 sam_prompt_encoder, sam_decoder = sam_model_registry[model_type](
     checkpoint=sam_checkpoint
 )
+
+
 sam_prompt_encoder.cuda()
 sam_decoder.cuda()
 
@@ -144,15 +152,32 @@ for name, param in protoype_prompt_encoder.named_parameters():
 print("======> Define Optmiser and Loss")
 seg_loss_model = DiceLoss().cuda()
 contrastive_loss_model = losses.NTXentLoss(temperature=0.07).cuda()
-optimiser = torch.optim.Adam(
+
+# change to AdamW
+# optimiser = torch.optim.Adam(
+#     [
+#         {"params": learnable_prototypes_model.parameters()},
+#         {"params": protoype_prompt_encoder.parameters()},
+#         {"params": sam_decoder.parameters()},
+#     ],
+#     lr=lr,
+#     weight_decay=0.0001,
+# )
+
+optimiser = torch.optim.AdamW(
     [
         {"params": learnable_prototypes_model.parameters()},
         {"params": protoype_prompt_encoder.parameters()},
         {"params": sam_decoder.parameters()},
     ],
     lr=lr,
-    weight_decay=0.0001,
+    weight_decay=0.01,
 )
+
+# Define the scheduler
+scheduler = ExponentialLR(optimiser, gamma=0.95)  # Adjust gamma to your needs
+
+
 
 
 print("======> Set Saving Directories and Logs")
@@ -230,6 +255,8 @@ for epoch in range(num_epochs):
         optimiser.zero_grad()
         loss.backward()
         optimiser.step()
+        # EXP optimierser step
+        scheduler.step()
 
     # validation
     binary_masks = dict()
