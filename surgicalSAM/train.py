@@ -23,7 +23,7 @@ from loss import DiceLoss
 from pytorch_metric_learning import losses
 from datetime import datetime
 
-# Exponantial LR 
+# Exponantial LR
 from torch.optim.lr_scheduler import ExponentialLR
 
 
@@ -94,7 +94,8 @@ val_dataloader = DataLoader(
 print("======> Load SAM")
 if vit_mode == "h":
     sam_checkpoint = "../ckp/sam/sam_vit_h_4b8939.pth"
-    
+
+print("Checkpoint: ", sam_checkpoint)
 model_type = "vit_h_no_image_encoder"
 
 sam_prompt_encoder, sam_decoder = sam_model_registry[model_type](
@@ -175,10 +176,7 @@ optimiser = torch.optim.AdamW(
 )
 
 # Define the scheduler
-scheduler = ExponentialLR(optimiser, gamma=0.95)  # Adjust gamma to your needs
-
-
-
+scheduler = ExponentialLR(optimiser, gamma=0.975)  # Adjust gamma to your needs
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
@@ -255,8 +253,9 @@ for epoch in range(num_epochs):
         optimiser.zero_grad()
         loss.backward()
         optimiser.step()
-        # EXP optimierser step
-        scheduler.step()
+
+    # EXP optimierser step
+    scheduler.step()
 
     # validation
     binary_masks = dict()
