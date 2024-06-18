@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 
@@ -15,7 +14,7 @@ from typing import Optional, Tuple
 from .utils.transforms import ResizeLongestSide
 
 
-class SamPredictor:
+class SamPredictor_old:
     def __init__(
         self,
         sam_model: Sam,
