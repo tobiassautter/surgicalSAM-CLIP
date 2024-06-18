@@ -51,7 +51,7 @@ fold = args.fold
 thr = 0
 seed = 666  # 666
 data_root_dir = f"../data/{dataset_name}"
-batch_size = 8 #32
+batch_size = 32 #32
 vit_mode = "h"
 
 # set seed for reproducibility
@@ -176,11 +176,11 @@ optimiser = torch.optim.Adam(
 )
 
 # Define the scheduler
-scheduler = ExponentialLR(optimiser, gamma=0.95)  # Adjust gamma to your needs
+scheduler = ExponentialLR(optimiser, gamma=0.9975)  # Adjust gamma to your needs
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
-log_file = osp.join(save_dir, "log.txt")
+log_file = osp.join(save_dir, "log_light.txt")
 print_log(str(args), log_file)
 
 
@@ -255,7 +255,9 @@ for epoch in range(num_epochs):
         optimiser.step()
 
     # EXP optimierser step
-    scheduler.step()
+    if epoch % 2 == 0:
+        scheduler.step()
+        print(f'Updated learning rate: {scheduler.get_last_lr()}')
 
     # validation
     binary_masks = dict()
@@ -308,7 +310,7 @@ for epoch in range(num_epochs):
                 "sam_decoder_state_dict": sam_decoder.state_dict(),
                 "prototypes_state_dict": learnable_prototypes_model.state_dict(),
             },
-            osp.join(save_dir, "model_ckp.pth"),
+            osp.join(save_dir, "model_ckp_light.pth"),
         )
 
         print_log(
