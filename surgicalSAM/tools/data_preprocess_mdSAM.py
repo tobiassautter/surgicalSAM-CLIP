@@ -171,7 +171,7 @@ args = parser.parse_args()
 # define the SAM model
 vit_mode = "h"
 if vit_mode == "h":
-    sam_checkpoint = "../../ckp/medSAM/medsam_b.pth"
+    sam_checkpoint = "../../ckp/medSAM/medsam_vit_b.pth"
 sam = sam_model_registry[f"vit_{vit_mode}"](checkpoint=sam_checkpoint)
 sam.cuda()
 predictor = SamPredictor(sam)
