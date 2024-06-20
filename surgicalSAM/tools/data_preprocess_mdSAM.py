@@ -169,8 +169,8 @@ args = parser.parse_args()
 
 
 # define the SAM model
-vit_mode = "h"
-if vit_mode == "h":
+vit_mode = "b"
+if vit_mode == "b":
     sam_checkpoint = "../../ckp/medSAM/medsam_vit_b.pth"
 sam = sam_model_registry[f"vit_{vit_mode}"](checkpoint=sam_checkpoint)
 sam.cuda()
