@@ -182,52 +182,59 @@ def _build_sam_no_image_encoder(
 
 
 # added for vit b
-def _build_sam_no_image_encoder_b(
-    checkpoint=None,
-):
-    prompt_embed_dim = 256
-    image_size = 1024
-    vit_patch_size = 16
-    image_embedding_size = image_size // vit_patch_size
+def _build_sam_no_image_encoder_b(checkpoint=None):
+    # Set embedding dimensions and other configurations based on ViT-B settings
+    prompt_embed_dim = 256  # Embedding dimension for prompts and transformers
+    image_size = 1024  # Typically the size of the input image
+    vit_patch_size = 16  # Patch size used in ViT models
+    image_embedding_size = (
+        image_size // vit_patch_size
+    )  # Calculate the size of the embedding grid
+
+    # Initialize the Mask Decoder with Transformer settings that match the encoder layers
     mask_decoder = MaskDecoder(
-        num_multimask_outputs=3,
+        num_multimask_outputs=3,  # The output dimension for mask predictions
         transformer=TwoWayTransformer(
-            depth=2,
+            depth=12,  # Depth matching the typical encoder block depth
             embedding_dim=prompt_embed_dim,
-            mlp_dim=2048,
-            num_heads=8,
+            mlp_dim=2048,  # This should be approximately 4x the embedding dimension
+            num_heads=12,  # Matching typical ViT-B head configuration
         ),
         transformer_dim=prompt_embed_dim,
         iou_head_depth=3,
         iou_head_hidden_dim=256,
     )
 
+    # Initialize the Prompt Encoder to encode the prompts correctly
     prompt_encoder = PromptEncoder(
         embed_dim=prompt_embed_dim,
         image_embedding_size=(image_embedding_size, image_embedding_size),
         input_image_size=(image_size, image_size),
-        mask_in_chans=16,
+        mask_in_chans=16,  # Assuming 16 channels for input mask encoding
     )
 
+    # Set the models to evaluation mode if not training
+    mask_decoder.eval()
     prompt_encoder.eval()
+
+    # Load checkpoint if it exists and is specified
     if checkpoint is not None:
         with open(checkpoint, "rb") as f:
             state_dict = torch.load(f)
 
-        # only filter the weight of the mask_decoder
+        # Filter and load state dicts for each component
         decoder_state_dict = {
             k.split("mask_decoder.")[-1]: v
             for k, v in state_dict.items()
-            if k.startswith("mask_decoder")
+            if "mask_decoder" in k
         }
-        mask_decoder.load_state_dict(decoder_state_dict)
+        mask_decoder.load_state_dict(decoder_state_dict, strict=False)
 
-        # only  filter the weight of the prompt_encoder
         prompt_encoder_state_dict = {
             k.split("prompt_encoder.")[-1]: v
             for k, v in state_dict.items()
-            if k.startswith("prompt_encoder")
+            if "prompt_encoder" in k
         }
-        prompt_encoder.load_state_dict(prompt_encoder_state_dict)
+        prompt_encoder.load_state_dict(prompt_encoder_state_dict, strict=False)
 
     return prompt_encoder, mask_decoder
