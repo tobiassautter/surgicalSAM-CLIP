@@ -72,7 +72,7 @@ dataloader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=4)
 
 print("======> Load SAM")
 # sam_checkpoint = "../ckp/sam/sam_vit_h_4b8939.pth"
-sam_checkpoint = "../ckp/lite_medsam/lite_medsam.pth"
+sam_checkpoint = "../ckp/medSAM/medsam_vit_b.pth"
 # print checkpoint
 print(f"checkpoint: {sam_checkpoint}")
 # try loading the model
