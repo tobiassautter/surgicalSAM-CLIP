@@ -88,10 +88,6 @@ for n, frame_name in enumerate(frame_list):
     frame_path = osp.join(frame_dir, frame_name)
     print(f"Processing frame {n+1}/{len(frame_list)}: {frame_name}")
 
-    original_frame = cv2.imread(frame_path)
-    original_frame = cv2.cvtColor(original_frame, cv2.COLOR_BGR2RGB)
-    original_frame = Image.fromarray(original_frame)
-
     # Find matching masks
     masks_name = [
         mask for mask in mask_list if mask.split("_")[0] == frame_name.split(".")[0]
@@ -107,15 +103,23 @@ for n, frame_name in enumerate(frame_list):
         mask = Image.fromarray(mask)
         original_masks.append(mask)
 
-        # obtain SAM feature of the augmented frame
-        original_frame = np.asarray(original_frame)
-        predictor.set_image(original_frame)
-        feat = predictor.features.squeeze().permute(1, 2, 0)
-        feat = feat.cpu().numpy()
+    masks = [np.asarray(mask) * 255 for mask in original_masks]
+
+    # set frame vars
+    original_frame = cv2.imread(frame_path)
+    original_frame = cv2.cvtColor(original_frame, cv2.COLOR_BGR2RGB)
+    original_frame = Image.fromarray(original_frame)
+
+    # obtain SAM feature of the augmented frame
+    original_frame = np.asarray(original_frame)
+
+    predictor.set_image(original_frame)
+    feat = predictor.features.squeeze().permute(1, 2, 0)
+    feat = feat.cpu().numpy()
 
     # Save the frame SAM feature
     feat_save_dir = osp.join(
-        data_root_dir, "train/0/sam_features_b", frame_name.split(".")[0]  # + ".npy"
+        data_root_dir, "train/0/sam_features_b", frame_name.split(".")[0] + ".npy"
     )
 
     print(f"Saving frame feature to {feat_save_dir}")
@@ -124,16 +128,34 @@ for n, frame_name in enumerate(frame_list):
     np.save(feat_save_dir, feat)
 
     # Process and save masks and embeddings
-    for mask, mask_name in zip(original_masks, masks_name):
-        mask_processed = set_mask(np.asarray(mask) * 255)
-        if (mask_processed > 0).any():
-            class_embedding = feat[mask_processed > 0]
-            class_embedding = class_embedding.mean(0).squeeze()
+    for mask, mask_name in zip(masks, masks_name):
 
-            class_embedding_save_dir = osp.join(
-                data_root_dir,
-                "train/0/class_embeddings_b",
-                mask_name.replace("png", "npy"),
-            )
-            os.makedirs(osp.dirname(class_embedding_save_dir), exist_ok=True)
-            np.save(class_embedding_save_dir, class_embedding)
+        # process augmented_masks to the same shape and format as the image
+        zeros = np.zeros_like(mask)
+        mask_processed = np.stack((mask, zeros, zeros), axis=-1)
+        mask_processed = set_mask(mask_processed)
+        mask_processed = F.interpolate(
+            mask_processed, size=torch.Size([64, 64]), mode="bilinear"
+        )
+        mask_processed = mask_processed.squeeze()[0]
+        # print(mask_processed.shape) and path to mask
+        print("mask_processed shape: ", mask_processed.shape)
+        print("mask_path: ", mask_path)
+
+        # if the augmented mask after processing does not have any foreground objects, then skip this mask
+        if (True in (mask_processed > 0)) == False:
+            continue
+
+        # compute the class embedding using frame SAM feature and processed mask
+        class_embedding = feat[mask_processed > 0]
+        class_embedding = class_embedding.mean(0).squeeze()
+
+        # save the augmented mask and the computed class embedding
+        class_embedding_save_dir = osp.join(
+            data_root_dir,
+            f"train/0/class_embeddings_{vit_mode}",
+            mask_name.replace("png", "npy"),
+        )
+        os.makedirs(osp.dirname(class_embedding_save_dir), exist_ok=True)
+
+        np.save(class_embedding_save_dir, class_embedding)
