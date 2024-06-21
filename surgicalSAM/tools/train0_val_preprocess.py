@@ -113,7 +113,7 @@ for n, frame_name in enumerate(frame_list):
 
     # Save the frame SAM feature
     feat_save_dir = osp.join(
-        data_root_dir, "sam_features_b", frame_name.split(".")[0] + ".npy"
+        data_root_dir, "train/0/sam_features_b", frame_name.split(".")[0] + ".npy"
     )
 
     print(f"Saving frame feature to {feat_save_dir}")
@@ -129,7 +129,9 @@ for n, frame_name in enumerate(frame_list):
             class_embedding = class_embedding.mean(0).squeeze()
 
             class_embedding_save_dir = osp.join(
-                data_root_dir, "class_embeddings_b", mask_name.replace("png", "npy")
+                data_root_dir,
+                "train/0/class_embeddings_b",
+                mask_name.replace("png", "npy"),
             )
             os.makedirs(osp.dirname(class_embedding_save_dir), exist_ok=True)
             np.save(class_embedding_save_dir, class_embedding)
