@@ -107,9 +107,10 @@ for n, frame_name in enumerate(frame_list):
         mask = Image.fromarray(mask)
         original_masks.append(mask)
 
-    # Obtain SAM features
-    predictor.set_image(np.asarray(original_frame))
-    feat = predictor.features.squeeze().permute(1, 2, 0).cpu().numpy()
+        # obtain SAM feature of the augmented frame
+        predictor.set_image(original_frame)
+        feat = predictor.features.squeeze().permute(1, 2, 0)
+        feat = feat.cpu().numpy()
 
     # Save the frame SAM feature
     feat_save_dir = osp.join(
