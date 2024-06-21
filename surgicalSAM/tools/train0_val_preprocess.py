@@ -9,24 +9,39 @@ from PIL import Image
 import torch
 from torch.nn import functional as F
 from segment_anything import sam_model_registry, SamPredictor
+from segment_anything.utils.transforms import ResizeLongestSide
+
+
+def set_torch_image(transformed_mask):
+    input_mask = preprocess(transformed_mask)  # pad to 1024
+    return input_mask
 
 
 def set_mask(mask):
-    """Transform the mask to the form expected by SAM."""
-    # Simplified version since original used ResizeLongestSide which is no longer needed
-    input_mask_torch = (
-        torch.as_tensor(mask).permute(2, 0, 1).contiguous()[None, :, :, :]
-    )
-    return preprocess(input_mask_torch)
+    """Transform the mask to the form expected by SAM, the transformed mask will be used to generate class embeddings
+    Adapated from set_image in the official code of SAM https://github.com/facebookresearch/segment-anything/blob/main/segment_anything/predictor.py
+    """
+    input_mask = ResizeLongestSide(1024).apply_image(mask)
+    input_mask_torch = torch.as_tensor(input_mask)
+    input_mask_torch = input_mask_torch.permute(2, 0, 1).contiguous()[None, :, :, :]
+
+    input_mask = set_torch_image(input_mask_torch)
+
+    return input_mask
 
 
 def preprocess(x):
     """Normalize pixel values and pad to a square input."""
+    # Normalize colors
     pixel_mean = torch.Tensor([123.675, 116.28, 103.53]).view(-1, 1, 1)
     pixel_std = torch.Tensor([58.395, 57.12, 57.375]).view(-1, 1, 1)
+
     x = (x - pixel_mean) / pixel_std
-    padh = 1024 - x.shape[-2]
-    padw = 1024 - x.shape[-1]
+
+    # Pad
+    h, w = x.shape[-2:]
+    padh = 1024 - h
+    padw = 1024 - w
     x = F.pad(x, (0, padw, 0, padh))
     return x
 
