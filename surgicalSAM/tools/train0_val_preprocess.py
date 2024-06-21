@@ -108,13 +108,14 @@ for n, frame_name in enumerate(frame_list):
         original_masks.append(mask)
 
         # obtain SAM feature of the augmented frame
+        original_frame = np.asarray(original_frame)
         predictor.set_image(original_frame)
         feat = predictor.features.squeeze().permute(1, 2, 0)
         feat = feat.cpu().numpy()
 
     # Save the frame SAM feature
     feat_save_dir = osp.join(
-        data_root_dir, "train/0/sam_features_b", frame_name.split(".")[0] + ".npy"
+        data_root_dir, "train/0/sam_features_b", frame_name.split(".")[0]  # + ".npy"
     )
 
     print(f"Saving frame feature to {feat_save_dir}")
