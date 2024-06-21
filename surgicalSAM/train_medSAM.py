@@ -96,7 +96,7 @@ if vit_mode == "b":
     sam_checkpoint = "../ckp/medSAM/medsam_vit_b.pth"
 
 print("Checkpoint: ", sam_checkpoint)
-model_type = "vit_h_no_image_encoder"
+model_type = "vit_b_no_image_encoder"
 
 sam_prompt_encoder, sam_decoder = sam_model_registry[model_type](
     checkpoint=sam_checkpoint
