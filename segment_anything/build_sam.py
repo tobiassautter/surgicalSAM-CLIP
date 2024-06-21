@@ -198,7 +198,7 @@ def _build_sam_no_image_encoder_b(checkpoint=None):
             depth=12,  # Depth matching the typical encoder block depth
             embedding_dim=prompt_embed_dim,
             mlp_dim=2048,  # This should be approximately 4x the embedding dimension
-            num_heads=12,  # Matching typical ViT-B head configuration
+            num_heads=16,  # 12,  # Matching typical ViT-B head configuration
         ),
         transformer_dim=prompt_embed_dim,
         iou_head_depth=3,
