@@ -50,6 +50,7 @@ def preprocess(x):
 vit_mode = "b"
 sam_checkpoint = "../../ckp/medSAM/medsam_vit_b.pth"
 sam = sam_model_registry[f"vit_{vit_mode}"](checkpoint=sam_checkpoint)
+print("SAM model loaded: ", sam_checkpoint)
 sam.cuda()
 predictor = SamPredictor(sam)
 
@@ -71,10 +72,22 @@ mask_list = [
     for filename in files
     if files
 ]
+# print files in frame and mask directories
+[print(f) for f in frame_list[:]]
+[print(f) for f in mask_list[:]]
+# print total number of frames and masks
+print("Total frames: ", len(frame_list))
+print("Total masks: ", len(mask_list))
+# print path to both
+print("Frame path: ", frame_dir)
+print("Mask path: ", mask_dir)
 
 # Processing frames and masks
 for n, frame_name in enumerate(frame_list):
+
     frame_path = osp.join(frame_dir, frame_name)
+    print(f"Processing frame {n+1}/{len(frame_list)}: {frame_name}")
+
     original_frame = cv2.imread(frame_path)
     original_frame = cv2.cvtColor(original_frame, cv2.COLOR_BGR2RGB)
     original_frame = Image.fromarray(original_frame)
@@ -102,6 +115,9 @@ for n, frame_name in enumerate(frame_list):
     feat_save_dir = osp.join(
         data_root_dir, "sam_features_b", frame_name.split(".")[0] + ".npy"
     )
+
+    print(f"Saving frame feature to {feat_save_dir}")
+
     os.makedirs(osp.dirname(feat_save_dir), exist_ok=True)
     np.save(feat_save_dir, feat)
 
