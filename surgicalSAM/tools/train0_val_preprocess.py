@@ -45,13 +45,15 @@ mask_dir = osp.join(data_root_dir, "train", "0", "binary_annotations")
 frame_dir = osp.join(data_root_dir, "train", "0", "images")
 
 frame_list = [
-    os.path.join(os.path.basename(subdir), file)
+    os.path.join(os.path.basename(subdir), filename)
     for subdir, _, files in os.walk(frame_dir)
+    for filename in files
     if files
 ]
 mask_list = [
-    os.path.join(os.path.basename(subdir), file)
+    os.path.join(os.path.basename(subdir), filename)
     for subdir, _, files in os.walk(mask_dir)
+    for filename in files
     if files
 ]
 
