@@ -77,7 +77,7 @@ sam_checkpoint = "../ckp/medSAM/medsam_vit_b.pth"
 print(f"checkpoint: {sam_checkpoint}")
 # try loading the model
 try:
-    model_type = "vit_h_no_image_encoder"
+    model_type = "vit_b_no_image_encoder"
     sam_prompt_encoder, sam_decoder = sam_model_registry[model_type](
         checkpoint=sam_checkpoint
     )

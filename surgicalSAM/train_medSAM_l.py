@@ -52,7 +52,7 @@ thr = 0
 seed = 666  # 666
 data_root_dir = f"../data/{dataset_name}"
 batch_size = 32 #32
-vit_mode = "h"
+vit_mode = "b"
 
 # set seed for reproducibility
 random.seed(seed)
@@ -66,33 +66,33 @@ print("======> Load Dataset-Specific Parameters")
 if "18" in dataset_name:
     num_tokens = 2
     val_dataset = Endovis18Dataset(
-        data_root_dir=data_root_dir, mode="val", vit_mode="h"
+        data_root_dir=data_root_dir, mode="val", vit_mode="b"
     )
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
-    num_epochs = 500  # 500
-    lr = 0.01  # 0.001
+    num_epochs = 200  # 500
+    lr = 0.005  # 0.001
     save_dir = "./work_dirs/endovis_2018/"
 
-elif "17" in dataset_name:
-    num_tokens = 4
-    val_dataset = Endovis17Dataset(
-        data_root_dir=data_root_dir, mode="val", fold=fold, vit_mode="h", version=0
-    )
-
-    gt_endovis_masks = read_gt_endovis_masks(
-        data_root_dir=data_root_dir, mode="val", fold=fold
-    )
-    num_epochs = 2000
-    lr = 0.0001
-    save_dir = f"./work_dirs/endovis_2017/{fold}"
+#elif "17" in dataset_name:
+#    num_tokens = 4
+#    val_dataset = Endovis17Dataset(
+#        data_root_dir=data_root_dir, mode="val", fold=fold, vit_mode="h", version=0
+#    )
+#
+#    gt_endovis_masks = read_gt_endovis_masks(
+#        data_root_dir=data_root_dir, mode="val", fold=fold
+#    )
+#    num_epochs = 2000
+#    lr = 0.0001
+#    save_dir = f"./work_dirs/endovis_2017/{fold}"
 
 val_dataloader = DataLoader(
     val_dataset, batch_size=batch_size, shuffle=True, num_workers=4
 )
 
 print("======> Load SAM")
-if vit_mode == "h":
+if vit_mode == "b":
     sam_checkpoint = "../ckp/lite_medsam/lite_medsam.pth"
 
 print("Checkpoint: ", sam_checkpoint)
@@ -152,7 +152,7 @@ for name, param in protoype_prompt_encoder.named_parameters():
 
 print("======> Define Optmiser and Loss")
 seg_loss_model = DiceLoss().cuda()
-contrastive_loss_model = losses.NTXentLoss(temperature=0.07).cuda()
+contrastive_loss_model = losses.NTXentLoss(temperature=0.15).cuda() #0.07
 
 # change to AdamW
 # optimiser = torch.optim.Adam(
@@ -175,8 +175,8 @@ optimiser = torch.optim.Adam(
     weight_decay=0.0001,  # 0.0001,
 )
 
-# Define the scheduler
-scheduler = ExponentialLR(optimiser, gamma=0.9975)  # Adjust gamma to your needs
+#Define the scheduler
+scheduler = ExponentialLR(optimiser, gamma=0.975)  # Adjust gamma to your needs
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)

@@ -48,7 +48,7 @@ print("data_root_dir: ", data_root_dir)
 print("======> Load Dataset-Specific Parameters")
 if "18" in dataset_name:
     num_tokens = 2
-    dataset = Endovis18Dataset(data_root_dir=data_root_dir, mode="val", vit_mode="h")
+    dataset = Endovis18Dataset(data_root_dir=data_root_dir, mode="val", vit_mode="b")
     surgicalSAM_ckp = f"../ckp/surgicalMDSAM/{dataset_name}/model_ckp_lite.pth"
 
     # debug check
