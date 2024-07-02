@@ -26,6 +26,9 @@ from datetime import datetime
 # Exponantial LR
 from torch.optim.lr_scheduler import ExponentialLR
 
+## logger
+import wandb
+
 
 print("======> Process Arguments")
 parser = argparse.ArgumentParser()
@@ -51,7 +54,7 @@ fold = args.fold
 thr = 0
 seed = 666  # 666
 data_root_dir = f"../data/{dataset_name}"
-batch_size = 32 #32
+batch_size = 16  # 32
 vit_mode = "b"
 
 # set seed for reproducibility
@@ -74,7 +77,7 @@ if "18" in dataset_name:
     lr = 0.005  # 0.001
     save_dir = "./work_dirs/endovis_2018/"
 
-#elif "17" in dataset_name:
+# elif "17" in dataset_name:
 #    num_tokens = 4
 #    val_dataset = Endovis17Dataset(
 #        data_root_dir=data_root_dir, mode="val", fold=fold, vit_mode="h", version=0
@@ -152,7 +155,7 @@ for name, param in protoype_prompt_encoder.named_parameters():
 
 print("======> Define Optmiser and Loss")
 seg_loss_model = DiceLoss().cuda()
-contrastive_loss_model = losses.NTXentLoss(temperature=0.15).cuda() #0.07
+contrastive_loss_model = losses.NTXentLoss(temperature=0.15).cuda()  # 0.07
 
 # change to AdamW
 # optimiser = torch.optim.Adam(
@@ -175,13 +178,27 @@ optimiser = torch.optim.Adam(
     weight_decay=0.0001,  # 0.0001,
 )
 
-#Define the scheduler
+# Define the scheduler
 scheduler = ExponentialLR(optimiser, gamma=0.975)  # Adjust gamma to your needs
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
 log_file = osp.join(save_dir, "log_light.txt")
 print_log(str(args), log_file)
+
+### wandb init
+# start a new wandb run to track this script
+wandb.init(
+    # set the wandb project where this run will be logged
+    project="surgicalSAM - Endovis 2018 - Lite",
+    # track hyperparameters and run metadata
+    config={
+        "learning_rate": lr,
+        "architecture": "MedSAM Lite",
+        "dataset": dataset_name,
+        "epochs": num_epochs,
+    },
+)
 
 
 print("======> Start Training and Validation")
@@ -257,7 +274,7 @@ for epoch in range(num_epochs):
     # EXP optimierser step
     if epoch % 2 == 0:
         scheduler.step()
-        print(f'Updated learning rate: {scheduler.get_last_lr()}')
+        print(f"Updated learning rate: {scheduler.get_last_lr()}")
 
     # validation
     binary_masks = dict()
@@ -299,6 +316,12 @@ for epoch in range(num_epochs):
         f"Timestamp: {datetime.now()} -----------------------------------------------",
         log_file,
     )
+    # log the results to wandb
+    wandb.log("Validation IoU", endovis_results["IoU"])
+    wandb.log("Validation Challenge IoU", endovis_results["challengIoU"])
+    wandb.log("mcIoU", endovis_results["mcIoU"])
+    wandb.log("mIoU", endovis_results["mIoU"])
+    wandb.log("cIoU_per_class", endovis_results["cIoU_per_class"])
 
     # save the model with the best challenge IoU
     if endovis_results["challengIoU"] > best_challenge_iou_val:
