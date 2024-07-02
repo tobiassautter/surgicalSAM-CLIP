@@ -29,6 +29,8 @@ from torch.optim.lr_scheduler import ExponentialLR
 ## logger
 import wandb_logger
 
+## import clip_model_emb.py
+import tools.clip_model_emb as clip_model_emb
 
 print("======> Process Arguments")
 parser = argparse.ArgumentParser()
@@ -57,7 +59,7 @@ data_root_dir = f"../data/{dataset_name}"
 batch_size = 16  # 32  # 32
 vit_mode = "b"  # "h"
 # for logger
-w_project_name = "surgicalSAM - Endovis 2018 - medSAM_CLIP"
+w_project_name = "surgicalSAM - Endovis 2018 - medSAM_clip_initEmb"
 c_loss_temp = 0.07
 
 # set seed for reproducibility
@@ -117,8 +119,15 @@ for name, param in sam_prompt_encoder.named_parameters():
 for name, param in sam_decoder.named_parameters():
     param.requires_grad = True
 
+# load clip embeddings
+print("======> Load CLIP Embeddings")
+clip_emb = clip_model_emb.get_emb()
+
 print("======> Load Prototypes and Prototype-based Prompt Encoder")
-learnable_prototypes_model = Learnable_Prototypes(num_classes=7, feat_dim=256).cuda()
+learnable_prototypes_model = Learnable_Prototypes(
+    num_classes=7, feat_dim=256, clip_embeddings=clip_emb
+).cuda()
+
 protoype_prompt_encoder = Prototype_Prompt_Encoder(
     feat_dim=256,
     hidden_dim_dense=128,
@@ -186,7 +195,7 @@ scheduler = ExponentialLR(optimiser, gamma=0.95)  # Adjust gamma to your needs
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
-log_file = osp.join(save_dir, "log.txt")
+log_file = osp.join(save_dir, "log_clip.txt")
 print_log(str(args), log_file)
 
 print("======> Start Training and Validation")
@@ -329,7 +338,7 @@ for epoch in range(num_epochs):
                 "sam_decoder_state_dict": sam_decoder.state_dict(),
                 "prototypes_state_dict": learnable_prototypes_model.state_dict(),
             },
-            osp.join(save_dir, "model_ckp.pth"),
+            osp.join(save_dir, "model_ckp_clip.pth"),
         )
 
         print_log(
