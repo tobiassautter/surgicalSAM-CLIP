@@ -190,7 +190,7 @@ print_log(str(args), log_file)
 
 ### wandb init
 # start a new wandb_logger run to track this script
-wandb_logger.init(
+wandb_logger.init_proj(
     project=w_project_name,
     config={
         "learning_rate": lr,
