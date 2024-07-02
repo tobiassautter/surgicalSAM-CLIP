@@ -54,11 +54,7 @@ fold = args.fold
 thr = 0
 seed = 123  # 666
 data_root_dir = f"../data/{dataset_name}"
-<<<<<<< HEAD
-batch_size = 12 #32
-=======
 batch_size = 16  # 32
->>>>>>> 6a49a5ca282ccd664ee102eeb60ba35d47dca4ee
 vit_mode = "b"
 
 # set seed for reproducibility
@@ -159,11 +155,7 @@ for name, param in protoype_prompt_encoder.named_parameters():
 
 print("======> Define Optmiser and Loss")
 seg_loss_model = DiceLoss().cuda()
-<<<<<<< HEAD
-contrastive_loss_model = losses.NTXentLoss(temperature=0.07).cuda() #0.07
-=======
-contrastive_loss_model = losses.NTXentLoss(temperature=0.15).cuda()  # 0.07
->>>>>>> 6a49a5ca282ccd664ee102eeb60ba35d47dca4ee
+contrastive_loss_model = losses.NTXentLoss(temperature=0.07).cuda()  # 0.07
 
 # change to AdamW
 # optimiser = torch.optim.Adam(
@@ -186,13 +178,8 @@ optimiser = torch.optim.Adam(
     weight_decay=0.0001,  # 0.0001,
 )
 
-<<<<<<< HEAD
-#Define the scheduler
-# scheduler = ExponentialLR(optimiser, gamma=0.975)  # Adjust gamma to your needs
-=======
 # Define the scheduler
 scheduler = ExponentialLR(optimiser, gamma=0.975)  # Adjust gamma to your needs
->>>>>>> 6a49a5ca282ccd664ee102eeb60ba35d47dca4ee
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
@@ -285,15 +272,9 @@ for epoch in range(num_epochs):
         optimiser.step()
 
     # EXP optimierser step
-<<<<<<< HEAD
-    #if epoch % 2 == 0:
-    #    scheduler.step()
-    #    print(f'Updated learning rate: {scheduler.get_last_lr()}')
-=======
     if epoch % 2 == 0:
         scheduler.step()
         print(f"Updated learning rate: {scheduler.get_last_lr()}")
->>>>>>> 6a49a5ca282ccd664ee102eeb60ba35d47dca4ee
 
     # validation
     binary_masks = dict()
