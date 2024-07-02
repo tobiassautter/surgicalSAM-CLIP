@@ -56,6 +56,7 @@ seed = 123  # 666
 data_root_dir = f"../data/{dataset_name}"
 batch_size = 16  # 32
 vit_mode = "b"
+# for logger
 w_project_name = "surgicalSAM - Endovis 2018 - Lite"
 c_loss_temp = 0.07
 
@@ -198,6 +199,7 @@ wandb_logger.init(
         "dataset": dataset_name,
         "epochs": num_epochs,
         "temperature": c_loss_temp,
+        "batch_size": batch_size,
     },
 )
 
@@ -319,8 +321,6 @@ for epoch in range(num_epochs):
     # log the results to wandb
     wandb_logger.log_results(endovis_results)
 
-    # wandb.log("cIoU_per_class", endovis_results["cIoU_per_class"])
-
     # save the model with the best challenge IoU
     if endovis_results["challengIoU"] > best_challenge_iou_val:
         best_challenge_iou_val = endovis_results["challengIoU"]
@@ -338,3 +338,6 @@ for epoch in range(num_epochs):
             f"Best Challenge IoU: {best_challenge_iou_val:.4f} at Epoch {epoch}",
             log_file,
         )
+
+# close the wandb run
+wandb_logger.close()

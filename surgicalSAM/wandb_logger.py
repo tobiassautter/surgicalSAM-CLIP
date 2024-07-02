@@ -36,3 +36,8 @@ def log_results(endovis_results):
 
     # Log the results to wandb
     wandb.log(log_data)
+
+
+# add closing method
+def close():
+    wandb.finish()

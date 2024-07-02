@@ -26,6 +26,9 @@ from datetime import datetime
 # Exponantial LR
 from torch.optim.lr_scheduler import ExponentialLR
 
+## logger
+import wandb_logger
+
 
 print("======> Process Arguments")
 parser = argparse.ArgumentParser()
@@ -51,8 +54,11 @@ fold = args.fold
 thr = 0
 seed = 666  # 666
 data_root_dir = f"../data/{dataset_name}"
-batch_size = 16 #32  # 32
+batch_size = 16  # 32  # 32
 vit_mode = "b"  # "h"
+# for logger
+w_project_name = "surgicalSAM - Endovis 2018 - medSAM"
+c_loss_temp = 0.07
 
 # set seed for reproducibility
 random.seed(seed)
@@ -74,7 +80,7 @@ if "18" in dataset_name:
     lr = 0.005  # 0.001
     save_dir = "./work_dirs/endovis_2018/"
 
-#elif "17" in dataset_name:
+# elif "17" in dataset_name:
 #    num_tokens = 4
 #    val_dataset = Endovis17Dataset(
 #        data_root_dir=data_root_dir, mode="val", fold=fold, vit_mode="h", version=0
@@ -88,7 +94,7 @@ if "18" in dataset_name:
 #    save_dir = f"./work_dirs/endovis_2017/{fold}"
 
 val_dataloader = DataLoader(
-    val_dataset, batch_size=batch_size, shuffle=True #, num_workers=4
+    val_dataset, batch_size=batch_size, shuffle=True  # , num_workers=4
 )
 
 print("======> Load SAM")
@@ -152,7 +158,7 @@ for name, param in protoype_prompt_encoder.named_parameters():
 
 print("======> Define Optmiser and Loss")
 seg_loss_model = DiceLoss().cuda()
-contrastive_loss_model = losses.NTXentLoss(temperature=0.07).cuda() #0.07
+contrastive_loss_model = losses.NTXentLoss(temperature=0.07).cuda()  # 0.07
 
 # change to AdamW
 # optimiser = torch.optim.Adam(
@@ -183,9 +189,22 @@ os.makedirs(save_dir, exist_ok=True)
 log_file = osp.join(save_dir, "log.txt")
 print_log(str(args), log_file)
 
-
 print("======> Start Training and Validation")
 best_challenge_iou_val = -100.0
+
+# for logging
+print("======> Initialize wandb")
+wandb_logger.init(
+    project=w_project_name,
+    config={
+        "learning_rate": lr,
+        "architecture": "MedSAM Lite",
+        "dataset": dataset_name,
+        "epochs": num_epochs,
+        "temperature": c_loss_temp,
+        "batch_size": batch_size,
+    },
+)
 
 for epoch in range(num_epochs):
 
@@ -297,6 +316,8 @@ for epoch in range(num_epochs):
         f"Timestamp: {datetime.now()} -----------------------------------------------",
         log_file,
     )
+    # log results to wandb
+    wandb_logger.log_results(endovis_results)
 
     # save the model with the best challenge IoU
     if endovis_results["challengIoU"] > best_challenge_iou_val:
@@ -315,3 +336,6 @@ for epoch in range(num_epochs):
             f"Best Challenge IoU: {best_challenge_iou_val:.4f} at Epoch {epoch}",
             log_file,
         )
+
+# close wandb
+wandb_logger.close()
