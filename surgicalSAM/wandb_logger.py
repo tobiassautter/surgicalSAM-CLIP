@@ -1,15 +1,15 @@
 import wandb
 
 
-def init_proj(project_name, config):
+def init(project, config):
     """
     Initialize a new wandb run.
 
-    :param project_name: Name of the wandb project.
+    :param project: Name of the wandb project.
     :param config: Dictionary containing run configurations.
     """
     wandb.init(
-        project=project_name,
+        project=project,
         config=config,
     )
 
