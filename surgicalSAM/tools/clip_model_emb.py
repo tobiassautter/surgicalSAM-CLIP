@@ -1,3 +1,8 @@
+from os import environ
+
+# Disable parallelism in tokenizers to avoid fork issues
+environ["TOKENIZERS_PARALLELISM"] = "false"
+
 from transformers import CLIPProcessor, CLIPModel
 import torch
 import torch.nn as nn
