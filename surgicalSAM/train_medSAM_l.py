@@ -49,9 +49,9 @@ print("======> Set Parameters for Training")
 dataset_name = args.dataset
 fold = args.fold
 thr = 0
-seed = 666  # 666
+seed = 123  # 666
 data_root_dir = f"../data/{dataset_name}"
-batch_size = 32 #32
+batch_size = 12 #32
 vit_mode = "b"
 
 # set seed for reproducibility
@@ -71,7 +71,7 @@ if "18" in dataset_name:
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
     num_epochs = 200  # 500
-    lr = 0.005  # 0.001
+    lr = 0.001  # 0.001
     save_dir = "./work_dirs/endovis_2018/"
 
 #elif "17" in dataset_name:
@@ -88,7 +88,7 @@ if "18" in dataset_name:
 #    save_dir = f"./work_dirs/endovis_2017/{fold}"
 
 val_dataloader = DataLoader(
-    val_dataset, batch_size=batch_size, shuffle=True, num_workers=4
+    val_dataset, batch_size=batch_size, shuffle=True, num_workers=2
 )
 
 print("======> Load SAM")
@@ -152,7 +152,7 @@ for name, param in protoype_prompt_encoder.named_parameters():
 
 print("======> Define Optmiser and Loss")
 seg_loss_model = DiceLoss().cuda()
-contrastive_loss_model = losses.NTXentLoss(temperature=0.15).cuda() #0.07
+contrastive_loss_model = losses.NTXentLoss(temperature=0.07).cuda() #0.07
 
 # change to AdamW
 # optimiser = torch.optim.Adam(
@@ -176,7 +176,7 @@ optimiser = torch.optim.Adam(
 )
 
 #Define the scheduler
-scheduler = ExponentialLR(optimiser, gamma=0.975)  # Adjust gamma to your needs
+# scheduler = ExponentialLR(optimiser, gamma=0.975)  # Adjust gamma to your needs
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
@@ -255,9 +255,9 @@ for epoch in range(num_epochs):
         optimiser.step()
 
     # EXP optimierser step
-    if epoch % 2 == 0:
-        scheduler.step()
-        print(f'Updated learning rate: {scheduler.get_last_lr()}')
+    #if epoch % 2 == 0:
+    #    scheduler.step()
+    #    print(f'Updated learning rate: {scheduler.get_last_lr()}')
 
     # validation
     binary_masks = dict()
