@@ -1,7 +1,7 @@
 import wandb
 
 
-def initialize_wandb(project_name, config):
+def init(project_name, config):
     """
     Initialize a new wandb run.
 
