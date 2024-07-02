@@ -27,7 +27,7 @@ from datetime import datetime
 from torch.optim.lr_scheduler import ExponentialLR
 
 ## logger
-import wandb
+import wandb_logger
 
 
 print("======> Process Arguments")
@@ -56,6 +56,8 @@ seed = 123  # 666
 data_root_dir = f"../data/{dataset_name}"
 batch_size = 16  # 32
 vit_mode = "b"
+w_project_name = "surgicalSAM - Endovis 2018 - Lite"
+c_loss_temp = 0.07
 
 # set seed for reproducibility
 random.seed(seed)
@@ -73,8 +75,8 @@ if "18" in dataset_name:
     )
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
-    num_epochs = 200  # 500
-    lr = 0.001  # 0.001
+    num_epochs = 100  # 500
+    lr = 0.005  # 0.001
     save_dir = "./work_dirs/endovis_2018/"
 
 # elif "17" in dataset_name:
@@ -155,7 +157,7 @@ for name, param in protoype_prompt_encoder.named_parameters():
 
 print("======> Define Optmiser and Loss")
 seg_loss_model = DiceLoss().cuda()
-contrastive_loss_model = losses.NTXentLoss(temperature=0.07).cuda()  # 0.07
+contrastive_loss_model = losses.NTXentLoss(temperature=c_loss_temp).cuda()  # 0.07
 
 # change to AdamW
 # optimiser = torch.optim.Adam(
@@ -187,19 +189,17 @@ log_file = osp.join(save_dir, "log_light.txt")
 print_log(str(args), log_file)
 
 ### wandb init
-# start a new wandb run to track this script
-wandb.init(
-    # set the wandb project where this run will be logged
-    project="surgicalSAM - Endovis 2018 - Lite",
-    # track hyperparameters and run metadata
+# start a new wandb_logger run to track this script
+wandb_logger.init(
+    project=w_project_name,
     config={
         "learning_rate": lr,
         "architecture": "MedSAM Lite",
         "dataset": dataset_name,
         "epochs": num_epochs,
+        "temperature": c_loss_temp,
     },
 )
-
 
 print("======> Start Training and Validation")
 best_challenge_iou_val = -100.0
@@ -317,11 +317,9 @@ for epoch in range(num_epochs):
         log_file,
     )
     # log the results to wandb
-    wandb.log("Validation IoU", endovis_results["IoU"])
-    wandb.log("Validation Challenge IoU", endovis_results["challengIoU"])
-    wandb.log("mcIoU", endovis_results["mcIoU"])
-    wandb.log("mIoU", endovis_results["mIoU"])
-    wandb.log("cIoU_per_class", endovis_results["cIoU_per_class"])
+    wandb_logger.log_results(endovis_results)
+
+    # wandb.log("cIoU_per_class", endovis_results["cIoU_per_class"])
 
     # save the model with the best challenge IoU
     if endovis_results["challengIoU"] > best_challenge_iou_val:
