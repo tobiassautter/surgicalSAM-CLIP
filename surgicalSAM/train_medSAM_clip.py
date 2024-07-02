@@ -121,7 +121,7 @@ for name, param in sam_decoder.named_parameters():
 
 # load clip embeddings
 print("======> Load CLIP Embeddings")
-clip_emb = clip_model_emb.get_emb()
+clip_emb = clip_model_emb.get_emb(output_dim=256)
 
 print("======> Load Prototypes and Prototype-based Prompt Encoder")
 learnable_prototypes_model = Learnable_Prototypes(
