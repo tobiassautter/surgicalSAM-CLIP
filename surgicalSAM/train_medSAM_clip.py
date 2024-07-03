@@ -25,6 +25,7 @@ from datetime import datetime
 
 # Exponantial LR
 from torch.optim.lr_scheduler import ExponentialLR
+from torch.optim.lr_scheduler import LinearLR
 
 ## logger
 import wandb_logger
@@ -61,6 +62,8 @@ vit_mode = "b"  # "h"
 # for logger
 w_project_name = "surgicalSAM - Endovis 2018 - medSAM_clip_initEmb"
 c_loss_temp = 0.07
+start_lr = 0.1
+end_lr = 0.0005
 
 # set seed for reproducibility
 random.seed(seed)
@@ -78,8 +81,8 @@ if "18" in dataset_name:
     )
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
-    num_epochs = 100  # 500
-    lr = 0.001  # 0.001
+    num_epochs = 500  # 500
+    lr = start_lr  # 0.001
     save_dir = "./work_dirs/endovis_2018/"
 
 # elif "17" in dataset_name:
@@ -167,7 +170,7 @@ for name, param in protoype_prompt_encoder.named_parameters():
 
 print("======> Define Optmiser and Loss")
 seg_loss_model = DiceLoss().cuda()
-contrastive_loss_model = losses.NTXentLoss(temperature=0.07).cuda()  # 0.07
+contrastive_loss_model = losses.NTXentLoss(temperature=c_loss_temp).cuda()  # 0.07
 
 # change to AdamW
 # optimiser = torch.optim.Adam(
@@ -192,6 +195,7 @@ optimiser = torch.optim.Adam(
 
 # Define the scheduler
 # scheduler = ExponentialLR(optimiser, gamma=0.95)  # Adjust gamma to your needs
+scheduler = LinearLR(optimizer=optimiser, start_factor=start_lr, end_factor=end_lr, last_epoch=150)
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
@@ -207,7 +211,7 @@ wandb_logger.init(
     project=w_project_name,
     config={
         "learning_rate": lr,
-        "architecture": "MedSAM Lite",
+        "architecture": "MedSAM - Clip Init",
         "dataset": dataset_name,
         "epochs": num_epochs,
         "temperature": c_loss_temp,
@@ -283,7 +287,6 @@ for epoch in range(num_epochs):
         optimiser.step()
 
     # EXP optimierser step
-    #scheduler.step()
 
     # validation
     binary_masks = dict()
@@ -314,6 +317,10 @@ for epoch in range(num_epochs):
 
     endovis_masks = create_endovis_masks(binary_masks, 1024, 1280)
     endovis_results = eval_endovis(endovis_masks, gt_endovis_masks)
+
+    # scheduler step after val
+    print(f"Updated learning rate: {scheduler.get_last_lr()}"
+    scheduler.step()
 
     # print validation results in log
     print_log(
