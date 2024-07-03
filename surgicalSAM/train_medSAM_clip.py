@@ -195,7 +195,9 @@ optimiser = torch.optim.Adam(
 
 # Define the scheduler
 # scheduler = ExponentialLR(optimiser, gamma=0.95)  # Adjust gamma to your needs
-scheduler = LinearLR(optimizer=optimiser, start_factor=start_lr, end_factor=end_lr, last_epoch=150)
+scheduler = LinearLR(
+    optimizer=optimiser, start_factor=start_lr, end_factor=end_lr, last_epoch=150
+)
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
@@ -319,7 +321,7 @@ for epoch in range(num_epochs):
     endovis_results = eval_endovis(endovis_masks, gt_endovis_masks)
 
     # scheduler step after val
-    print(f"Updated learning rate: {scheduler.get_last_lr()}"
+    print(f"Updated learning rate: {scheduler.get_last_lr()}")
     scheduler.step()
 
     # print validation results in log
