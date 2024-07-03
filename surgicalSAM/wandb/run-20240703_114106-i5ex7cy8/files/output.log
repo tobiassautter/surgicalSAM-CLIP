@@ -6,3 +6,7 @@ Best Challenge IoU: 0.0000 at Epoch 0
 3778
 Validation - Epoch: 1/499; IoU_Results: {'challengIoU': 0.0, 'IoU': 0.0, 'mcIoU': 0.0, 'mIoU': 0.0, 'cIoU_per_class': [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
 Timestamp: 2024-07-03 11:51:06.040897 -----------------------------------------------
+3778
+Validation - Epoch: 2/499; IoU_Results: {'challengIoU': 28.566, 'IoU': 28.566, 'mcIoU': 15.939, 'mIoU': 29.069, 'cIoU_per_class': [32.488, 8.188, 32.183, 33.129, 1.056, 0.604, 3.923]}
+Timestamp: 2024-07-03 11:56:24.864887 -----------------------------------------------
+Best Challenge IoU: 28.5660 at Epoch 2
