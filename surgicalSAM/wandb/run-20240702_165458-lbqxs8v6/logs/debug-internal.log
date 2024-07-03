@@ -1,0 +1,273 @@
+2024-07-02 16:54:58,582 INFO    StreamThr :829621 [internal.py:wandb_internal():85] W&B internal server running at pid: 829621, started at: 2024-07-02 16:54:58.581482
+2024-07-02 16:54:58,583 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status
+2024-07-02 16:54:58,584 INFO    WriterThread:829621 [datastore.py:open_for_write():87] open: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/run-lbqxs8v6.wandb
+2024-07-02 16:54:58,587 DEBUG   SenderThread:829621 [sender.py:send():379] send: header
+2024-07-02 16:54:58,625 DEBUG   SenderThread:829621 [sender.py:send():379] send: run
+2024-07-02 16:54:59,062 INFO    SenderThread:829621 [dir_watcher.py:__init__():211] watching files in: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files
+2024-07-02 16:54:59,062 INFO    SenderThread:829621 [sender.py:_start_run_threads():1188] run started: lbqxs8v6 with start time 1719932098.582693
+2024-07-02 16:54:59,077 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: check_version
+2024-07-02 16:54:59,078 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: check_version
+2024-07-02 16:54:59,454 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: run_start
+2024-07-02 16:54:59,466 DEBUG   HandlerThread:829621 [system_info.py:__init__():26] System info init
+2024-07-02 16:54:59,466 DEBUG   HandlerThread:829621 [system_info.py:__init__():41] System info init done
+2024-07-02 16:54:59,466 INFO    HandlerThread:829621 [system_monitor.py:start():194] Starting system monitor
+2024-07-02 16:54:59,466 INFO    SystemMonitor:829621 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2024-07-02 16:54:59,466 INFO    HandlerThread:829621 [system_monitor.py:probe():214] Collecting system info
+2024-07-02 16:54:59,467 INFO    SystemMonitor:829621 [interfaces.py:start():188] Started cpu monitoring
+2024-07-02 16:54:59,467 INFO    SystemMonitor:829621 [interfaces.py:start():188] Started disk monitoring
+2024-07-02 16:54:59,468 INFO    SystemMonitor:829621 [interfaces.py:start():188] Started gpu monitoring
+2024-07-02 16:54:59,468 INFO    SystemMonitor:829621 [interfaces.py:start():188] Started memory monitoring
+2024-07-02 16:54:59,468 INFO    SystemMonitor:829621 [interfaces.py:start():188] Started network monitoring
+2024-07-02 16:54:59,493 DEBUG   HandlerThread:829621 [system_info.py:probe():152] Probing system
+2024-07-02 16:54:59,511 DEBUG   HandlerThread:829621 [system_info.py:_probe_git():137] Probing git
+2024-07-02 16:54:59,574 DEBUG   HandlerThread:829621 [system_info.py:_probe_git():145] Probing git done
+2024-07-02 16:54:59,574 DEBUG   HandlerThread:829621 [system_info.py:probe():200] Probing system done
+2024-07-02 16:54:59,575 DEBUG   HandlerThread:829621 [system_monitor.py:probe():223] {'os': 'Linux-5.15.0-100-generic-x86_64-with-glibc2.35', 'python': '3.10.12', 'heartbeatAt': '2024-07-02T14:54:59.493343', 'startedAt': '2024-07-02T14:54:58.569236', 'docker': None, 'cuda': None, 'args': ('--dataset', 'endovis_2018'), 'state': 'running', 'program': '/graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/train_medSAM_l.py', 'codePathLocal': 'train_medSAM_l.py', 'codePath': 'surgicalSAM/train_medSAM_l.py', 'git': {'remote': 'git@github.com:tobiassautter/surgicalMDSAM.git', 'commit': '86d2ce1d2ffac41bf958727fcc60b0b65d834f24'}, 'email': 'tobias.sautter@gmx.de', 'root': '/graphics/scratch2/students/sautterto/surgicalMDSAM', 'host': 'cgpool1800', 'username': 'sautterto', 'executable': '/graphics/scratch2/students/sautterto/surgicalMDSAM/ENV/bin/python', 'cpu_count': 4, 'cpu_count_logical': 8, 'cpu_freq': {'current': 4176.44175, 'min': 800.0, 'max': 4500.0}, 'cpu_freq_per_core': [{'current': 4300.0, 'min': 800.0, 'max': 4500.0}, {'current': 4300.0, 'min': 800.0, 'max': 4500.0}, {'current': 4300.0, 'min': 800.0, 'max': 4500.0}, {'current': 4300.0, 'min': 800.0, 'max': 4500.0}, {'current': 3311.534, 'min': 800.0, 'max': 4500.0}, {'current': 4300.0, 'min': 800.0, 'max': 4500.0}, {'current': 4300.0, 'min': 800.0, 'max': 4500.0}, {'current': 4300.0, 'min': 800.0, 'max': 4500.0}], 'disk': {'/': {'total': 468.3797836303711, 'used': 58.08931350708008}}, 'gpu': 'NVIDIA GeForce GTX 1080 Ti', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA GeForce GTX 1080 Ti', 'memory_total': 11811160064}], 'memory': {'total': 31.255661010742188}}
+2024-07-02 16:54:59,575 INFO    HandlerThread:829621 [system_monitor.py:probe():224] Finished collecting system info
+2024-07-02 16:54:59,575 INFO    HandlerThread:829621 [system_monitor.py:probe():227] Publishing system info
+2024-07-02 16:54:59,586 INFO    HandlerThread:829621 [system_monitor.py:probe():229] Finished publishing system info
+2024-07-02 16:54:59,597 DEBUG   SenderThread:829621 [sender.py:send():379] send: files
+2024-07-02 16:54:59,598 INFO    SenderThread:829621 [sender.py:_save_file():1454] saving file wandb-metadata.json with policy now
+2024-07-02 16:54:59,804 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: python_packages
+2024-07-02 16:54:59,804 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: python_packages
+2024-07-02 16:54:59,810 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: stop_status
+2024-07-02 16:54:59,811 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:54:59,835 DEBUG   SenderThread:829621 [sender.py:send():379] send: telemetry
+2024-07-02 16:54:59,835 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: stop_status
+2024-07-02 16:55:00,064 INFO    Thread-12 :829621 [dir_watcher.py:_on_file_created():271] file/dir created: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/wandb-metadata.json
+2024-07-02 16:55:00,065 INFO    Thread-12 :829621 [dir_watcher.py:_on_file_created():271] file/dir created: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/output.log
+2024-07-02 16:55:00,065 INFO    Thread-12 :829621 [dir_watcher.py:_on_file_created():271] file/dir created: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/requirements.txt
+2024-07-02 16:55:00,218 INFO    wandb-upload_0:829621 [upload_job.py:push():130] Uploaded file /tmp/tmpg_xtfx85wandb/3638t08j-wandb-metadata.json
+2024-07-02 16:55:00,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:01,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:02,075 INFO    Thread-12 :829621 [dir_watcher.py:_on_file_modified():288] file/dir modified: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/output.log
+2024-07-02 16:55:02,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:03,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:04,044 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:55:04,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:05,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:06,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:07,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:08,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:09,805 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:55:09,807 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:10,807 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:11,814 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:12,814 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:13,814 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:14,804 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: stop_status
+2024-07-02 16:55:14,805 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: stop_status
+2024-07-02 16:55:14,846 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:15,012 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:55:15,814 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:16,814 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:17,814 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:18,814 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:19,814 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:20,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:55:20,814 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:21,815 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:22,815 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:23,815 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:24,815 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:25,815 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:26,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:55:26,815 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:27,817 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:28,817 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:29,804 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: stop_status
+2024-07-02 16:55:29,805 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: stop_status
+2024-07-02 16:55:29,846 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:30,818 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:31,818 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:32,049 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:55:32,818 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:33,099 INFO    Thread-12 :829621 [dir_watcher.py:_on_file_modified():288] file/dir modified: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/config.yaml
+2024-07-02 16:55:33,818 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:34,818 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:35,818 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:36,818 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:37,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:55:37,818 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:38,818 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:39,819 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:40,818 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:41,819 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:42,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:55:42,819 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:43,819 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:44,804 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: stop_status
+2024-07-02 16:55:44,805 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: stop_status
+2024-07-02 16:55:44,846 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:45,819 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:46,819 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:47,819 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:47,966 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:55:48,819 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:55:53,619 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:55:58,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:55:59,469 DEBUG   SystemMonitor:829621 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2024-07-02 16:55:59,469 DEBUG   SenderThread:829621 [sender.py:send():379] send: stats
+2024-07-02 16:55:59,805 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: stop_status
+2024-07-02 16:55:59,805 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: stop_status
+2024-07-02 16:56:04,039 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:56:09,806 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:56:14,805 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: stop_status
+2024-07-02 16:56:15,402 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:56:15,402 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: stop_status
+2024-07-02 16:56:20,119 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:56:23,723 INFO    Thread-12 :829621 [dir_watcher.py:_on_file_modified():288] file/dir modified: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/output.log
+2024-07-02 16:56:25,807 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:56:29,470 DEBUG   SenderThread:829621 [sender.py:send():379] send: stats
+2024-07-02 16:56:29,805 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: stop_status
+2024-07-02 16:56:29,805 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: stop_status
+2024-07-02 16:56:31,031 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:56:36,807 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:56:41,807 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:56:44,805 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: stop_status
+2024-07-02 16:56:44,805 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: stop_status
+2024-07-02 16:56:46,936 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:56:50,137 DEBUG   SenderThread:829621 [sender.py:send():379] send: telemetry
+2024-07-02 16:56:50,138 DEBUG   SenderThread:829621 [sender.py:send():379] send: exit
+2024-07-02 16:56:50,138 INFO    SenderThread:829621 [sender.py:send_exit():586] handling exit code: 1
+2024-07-02 16:56:50,139 INFO    SenderThread:829621 [sender.py:send_exit():588] handling runtime: 110
+2024-07-02 16:56:50,148 INFO    SenderThread:829621 [sender.py:_save_file():1454] saving file wandb-summary.json with policy end
+2024-07-02 16:56:50,160 INFO    SenderThread:829621 [sender.py:send_exit():594] send defer
+2024-07-02 16:56:50,161 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:50,161 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 0
+2024-07-02 16:56:50,162 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:50,162 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 0
+2024-07-02 16:56:50,162 INFO    SenderThread:829621 [sender.py:transition_state():614] send defer: 1
+2024-07-02 16:56:50,162 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:50,163 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 1
+2024-07-02 16:56:50,163 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:50,164 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 1
+2024-07-02 16:56:50,164 INFO    SenderThread:829621 [sender.py:transition_state():614] send defer: 2
+2024-07-02 16:56:50,164 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:50,164 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 2
+2024-07-02 16:56:50,164 INFO    HandlerThread:829621 [system_monitor.py:finish():203] Stopping system monitor
+2024-07-02 16:56:50,166 INFO    HandlerThread:829621 [interfaces.py:finish():200] Joined cpu monitor
+2024-07-02 16:56:50,166 INFO    HandlerThread:829621 [interfaces.py:finish():200] Joined disk monitor
+2024-07-02 16:56:50,167 DEBUG   SystemMonitor:829621 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2024-07-02 16:56:50,167 DEBUG   SystemMonitor:829621 [system_monitor.py:_start():183] Publishing last batch of metrics
+2024-07-02 16:56:50,210 INFO    HandlerThread:829621 [interfaces.py:finish():200] Joined gpu monitor
+2024-07-02 16:56:50,210 INFO    HandlerThread:829621 [interfaces.py:finish():200] Joined memory monitor
+2024-07-02 16:56:50,210 INFO    HandlerThread:829621 [interfaces.py:finish():200] Joined network monitor
+2024-07-02 16:56:50,210 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:50,210 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 2
+2024-07-02 16:56:50,210 INFO    SenderThread:829621 [sender.py:transition_state():614] send defer: 3
+2024-07-02 16:56:50,210 DEBUG   SenderThread:829621 [sender.py:send():379] send: stats
+2024-07-02 16:56:50,210 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:50,210 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 3
+2024-07-02 16:56:50,211 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:50,211 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 3
+2024-07-02 16:56:50,211 INFO    SenderThread:829621 [sender.py:transition_state():614] send defer: 4
+2024-07-02 16:56:50,211 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:50,211 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 4
+2024-07-02 16:56:50,211 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:50,211 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 4
+2024-07-02 16:56:50,211 INFO    SenderThread:829621 [sender.py:transition_state():614] send defer: 5
+2024-07-02 16:56:50,211 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:50,211 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 5
+2024-07-02 16:56:50,211 DEBUG   SenderThread:829621 [sender.py:send():379] send: summary
+2024-07-02 16:56:50,257 INFO    SenderThread:829621 [sender.py:_save_file():1454] saving file wandb-summary.json with policy end
+2024-07-02 16:56:50,257 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:50,257 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 5
+2024-07-02 16:56:50,257 INFO    SenderThread:829621 [sender.py:transition_state():614] send defer: 6
+2024-07-02 16:56:50,257 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:50,258 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 6
+2024-07-02 16:56:50,258 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:50,258 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 6
+2024-07-02 16:56:50,261 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: status_report
+2024-07-02 16:56:50,456 INFO    SenderThread:829621 [sender.py:transition_state():614] send defer: 7
+2024-07-02 16:56:50,456 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:50,456 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 7
+2024-07-02 16:56:50,457 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:50,457 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 7
+2024-07-02 16:56:50,745 INFO    Thread-12 :829621 [dir_watcher.py:_on_file_modified():288] file/dir modified: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/config.yaml
+2024-07-02 16:56:50,746 INFO    Thread-12 :829621 [dir_watcher.py:_on_file_created():271] file/dir created: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/wandb-summary.json
+2024-07-02 16:56:51,137 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: poll_exit
+2024-07-02 16:56:52,762 INFO    Thread-12 :829621 [dir_watcher.py:_on_file_modified():288] file/dir modified: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/output.log
+2024-07-02 16:56:54,733 INFO    SenderThread:829621 [sender.py:transition_state():614] send defer: 8
+2024-07-02 16:56:54,733 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: poll_exit
+2024-07-02 16:56:54,734 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:54,734 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 8
+2024-07-02 16:56:54,735 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:54,735 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 8
+2024-07-02 16:56:54,735 INFO    SenderThread:829621 [job_builder.py:build():440] Attempting to build job artifact
+2024-07-02 16:56:54,739 INFO    SenderThread:829621 [job_builder.py:_get_source_type():569] is repo sourced job
+2024-07-02 16:56:54,777 INFO    Thread-12 :829621 [dir_watcher.py:_on_file_modified():288] file/dir modified: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/output.log
+2024-07-02 16:56:54,805 INFO    SenderThread:829621 [job_builder.py:build():545] adding wandb-job metadata file
+2024-07-02 16:56:54,823 INFO    SenderThread:829621 [sender.py:transition_state():614] send defer: 9
+2024-07-02 16:56:54,823 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:54,823 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 9
+2024-07-02 16:56:54,824 DEBUG   SenderThread:829621 [sender.py:send():379] send: artifact
+2024-07-02 16:56:55,140 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: poll_exit
+2024-07-02 16:56:55,962 INFO    wandb-upload_0:829621 [upload_job.py:push():88] Uploaded file /tmp/tmp9ipvftk3/wandb-job.json
+2024-07-02 16:56:55,999 INFO    wandb-upload_1:829621 [upload_job.py:push():88] Uploaded file /home/sautterto/.local/share/wandb/artifacts/staging/tmp06u8z2tg
+2024-07-02 16:56:56,978 INFO    SenderThread:829621 [sender.py:send_artifact():1530] sent artifact job-git_github.com_tobiassautter_surgicalMDSAM.git_surgicalSAM_train_medSAM_l.py - {'id': 'QXJ0aWZhY3Q6OTM2NTI3ODAy', 'state': 'PENDING', 'artifactSequence': {'id': 'QXJ0aWZhY3RDb2xsZWN0aW9uOjIzODE1NTM2Nw==', 'latestArtifact': None}}
+2024-07-02 16:56:56,978 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:56,978 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 9
+2024-07-02 16:56:56,979 INFO    SenderThread:829621 [dir_watcher.py:finish():358] shutting down directory watcher
+2024-07-02 16:56:57,780 INFO    SenderThread:829621 [dir_watcher.py:finish():388] scan: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files
+2024-07-02 16:56:57,781 INFO    SenderThread:829621 [dir_watcher.py:finish():402] scan save: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/config.yaml config.yaml
+2024-07-02 16:56:57,781 INFO    SenderThread:829621 [dir_watcher.py:finish():402] scan save: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/wandb-metadata.json wandb-metadata.json
+2024-07-02 16:56:57,782 INFO    SenderThread:829621 [dir_watcher.py:finish():402] scan save: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/requirements.txt requirements.txt
+2024-07-02 16:56:57,782 INFO    SenderThread:829621 [dir_watcher.py:finish():402] scan save: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/output.log output.log
+2024-07-02 16:56:57,783 INFO    SenderThread:829621 [dir_watcher.py:finish():402] scan save: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/wandb-summary.json wandb-summary.json
+2024-07-02 16:56:57,791 INFO    SenderThread:829621 [sender.py:transition_state():614] send defer: 10
+2024-07-02 16:56:57,791 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: poll_exit
+2024-07-02 16:56:57,791 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:57,792 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 10
+2024-07-02 16:56:57,792 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:57,792 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 10
+2024-07-02 16:56:57,792 INFO    SenderThread:829621 [file_pusher.py:finish():169] shutting down file pusher
+2024-07-02 16:56:58,143 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: poll_exit
+2024-07-02 16:56:58,144 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: poll_exit
+2024-07-02 16:56:58,168 INFO    wandb-upload_0:829621 [upload_job.py:push():130] Uploaded file /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/config.yaml
+2024-07-02 16:56:58,179 INFO    wandb-upload_1:829621 [upload_job.py:push():130] Uploaded file /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/requirements.txt
+2024-07-02 16:56:58,220 INFO    wandb-upload_3:829621 [upload_job.py:push():130] Uploaded file /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/wandb-summary.json
+2024-07-02 16:56:58,233 INFO    wandb-upload_2:829621 [upload_job.py:push():130] Uploaded file /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/files/output.log
+2024-07-02 16:56:58,434 INFO    Thread-11 (_thread_body):829621 [sender.py:transition_state():614] send defer: 11
+2024-07-02 16:56:58,434 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:58,435 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 11
+2024-07-02 16:56:58,436 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:58,436 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 11
+2024-07-02 16:56:58,436 INFO    SenderThread:829621 [file_pusher.py:join():175] waiting for file pusher
+2024-07-02 16:56:58,436 INFO    SenderThread:829621 [sender.py:transition_state():614] send defer: 12
+2024-07-02 16:56:58,437 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:58,437 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 12
+2024-07-02 16:56:58,438 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:58,438 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 12
+2024-07-02 16:56:58,438 INFO    SenderThread:829621 [file_stream.py:finish():601] file stream finish called
+2024-07-02 16:56:58,917 INFO    SenderThread:829621 [file_stream.py:finish():605] file stream finish is done
+2024-07-02 16:56:58,917 INFO    SenderThread:829621 [sender.py:transition_state():614] send defer: 13
+2024-07-02 16:56:58,917 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:58,918 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 13
+2024-07-02 16:56:58,918 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:58,919 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 13
+2024-07-02 16:56:58,919 INFO    SenderThread:829621 [sender.py:transition_state():614] send defer: 14
+2024-07-02 16:56:58,919 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: defer
+2024-07-02 16:56:58,919 INFO    HandlerThread:829621 [handler.py:handle_request_defer():184] handle defer: 14
+2024-07-02 16:56:58,920 DEBUG   SenderThread:829621 [sender.py:send():379] send: final
+2024-07-02 16:56:58,921 DEBUG   SenderThread:829621 [sender.py:send():379] send: footer
+2024-07-02 16:56:58,921 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: defer
+2024-07-02 16:56:58,921 INFO    SenderThread:829621 [sender.py:send_request_defer():610] handle sender defer: 14
+2024-07-02 16:56:58,923 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: poll_exit
+2024-07-02 16:56:58,923 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: poll_exit
+2024-07-02 16:56:58,925 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: server_info
+2024-07-02 16:56:58,925 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: server_info
+2024-07-02 16:56:58,931 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: poll_exit
+2024-07-02 16:56:58,931 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: get_summary
+2024-07-02 16:56:58,931 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: sampled_history
+2024-07-02 16:56:58,931 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: internal_messages
+2024-07-02 16:56:59,072 DEBUG   SenderThread:829621 [sender.py:send_request():406] send_request: poll_exit
+2024-07-02 16:56:59,073 INFO    MainThread:829621 [wandb_run.py:_footer_history_summary_info():3991] rendering history
+2024-07-02 16:56:59,073 INFO    MainThread:829621 [wandb_run.py:_footer_history_summary_info():4023] rendering summary
+2024-07-02 16:56:59,074 INFO    MainThread:829621 [wandb_run.py:_footer_sync_info():3950] logging synced files
+2024-07-02 16:56:59,075 DEBUG   HandlerThread:829621 [handler.py:handle_request():158] handle_request: shutdown
+2024-07-02 16:56:59,075 INFO    HandlerThread:829621 [handler.py:finish():882] shutting down handler
+2024-07-02 16:56:59,931 INFO    WriterThread:829621 [datastore.py:close():296] close: /graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/wandb/run-20240702_165458-lbqxs8v6/run-lbqxs8v6.wandb
+2024-07-02 16:57:00,073 INFO    SenderThread:829621 [sender.py:finish():1608] shutting down sender
+2024-07-02 16:57:00,073 INFO    SenderThread:829621 [file_pusher.py:finish():169] shutting down file pusher
+2024-07-02 16:57:00,073 INFO    SenderThread:829621 [file_pusher.py:join():175] waiting for file pusher

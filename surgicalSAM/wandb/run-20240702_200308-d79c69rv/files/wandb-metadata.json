@@ -1,0 +1,91 @@
+{
+    "os": "Linux-5.15.0-100-generic-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "heartbeatAt": "2024-07-02T18:03:09.874252",
+    "startedAt": "2024-07-02T18:03:08.998590",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--dataset",
+        "endovis_2018"
+    ],
+    "state": "running",
+    "program": "/graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/train_medSAM_clip.py",
+    "codePathLocal": "train_medSAM_clip.py",
+    "codePath": "surgicalSAM/train_medSAM_clip.py",
+    "git": {
+        "remote": "git@github.com:tobiassautter/surgicalMDSAM.git",
+        "commit": "da9005fe6d90c59806f1eed1c67822c834acaf95"
+    },
+    "email": "tobias.sautter@gmx.de",
+    "root": "/graphics/scratch2/students/sautterto/surgicalMDSAM",
+    "host": "cgpool1802",
+    "username": "sautterto",
+    "executable": "/graphics/scratch2/students/sautterto/surgicalMDSAM/ENV/bin/python",
+    "cpu_count": 4,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 3862.503125,
+        "min": 800.0,
+        "max": 4500.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 4300.0,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 4300.0,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 4300.0,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 4300.0,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 4300.0,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 800.025,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 4300.0,
+            "min": 800.0,
+            "max": 4500.0
+        },
+        {
+            "current": 4300.0,
+            "min": 800.0,
+            "max": 4500.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 468.3797836303711,
+            "used": 45.210262298583984
+        }
+    },
+    "gpu": "NVIDIA GeForce GTX 1080 Ti",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce GTX 1080 Ti",
+            "memory_total": 11811160064
+        }
+    ],
+    "memory": {
+        "total": 31.255653381347656
+    }
+}

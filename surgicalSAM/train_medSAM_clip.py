@@ -79,7 +79,7 @@ if "18" in dataset_name:
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
     num_epochs = 100  # 500
-    lr = 0.005  # 0.001
+    lr = 0.001  # 0.001
     save_dir = "./work_dirs/endovis_2018/"
 
 # elif "17" in dataset_name:
@@ -104,7 +104,7 @@ if vit_mode == "b":
     sam_checkpoint = "../ckp/medSAM/medsam_vit_b.pth"
 
 print("Checkpoint: ", sam_checkpoint)
-model_type = "vit_b_no_image_encoder"
+model_type = "vit_h_no_image_encoder"
 
 sam_prompt_encoder, sam_decoder = sam_model_registry[model_type](
     checkpoint=sam_checkpoint
@@ -191,7 +191,7 @@ optimiser = torch.optim.Adam(
 )
 
 # Define the scheduler
-scheduler = ExponentialLR(optimiser, gamma=0.95)  # Adjust gamma to your needs
+# scheduler = ExponentialLR(optimiser, gamma=0.95)  # Adjust gamma to your needs
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
@@ -283,7 +283,7 @@ for epoch in range(num_epochs):
         optimiser.step()
 
     # EXP optimierser step
-    scheduler.step()
+    #scheduler.step()
 
     # validation
     binary_masks = dict()

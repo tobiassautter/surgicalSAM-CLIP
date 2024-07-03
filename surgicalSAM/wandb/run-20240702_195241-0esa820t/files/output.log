@@ -1,0 +1,12 @@
+
+3778
+Traceback (most recent call last):
+  File "/graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/train_medSAM_clip.py", line 261, in <module>
+    preds, _ = model_forward_function(
+  File "/graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/model_forward.py", line 16, in model_forward_function
+    dense_embeddings, sparse_embeddings = prototype_prompt_encoder(sam_feats, prototypes, cls_ids)
+  File "/graphics/scratch2/students/sautterto/surgicalMDSAM/ENV/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1110, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/graphics/scratch2/students/sautterto/surgicalMDSAM/surgicalSAM/model_clip.py", line 39, in forward
+    sim = torch.matmul(feat, cls_prompts)
+RuntimeError: Expected size for first two dimensions of batch2 tensor to be: [112, 256] but got: [112, 512].
