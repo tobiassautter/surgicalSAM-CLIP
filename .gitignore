@@ -46,4 +46,4 @@ work_dirs/
 /data
 /ENV_SAM
 ENV/
-surgicalSAM/wandb
+surgicalSAM/wandb/
