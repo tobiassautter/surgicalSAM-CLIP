@@ -62,8 +62,6 @@ vit_mode = "b"  # "h"
 # for logger
 w_project_name = "surgicalSAM - Endovis 2018 - medSAM_clip_initEmb"
 c_loss_temp = 0.07
-start_lr = 0.1
-end_lr = 0.0005
 
 # set seed for reproducibility
 random.seed(seed)
@@ -82,7 +80,7 @@ if "18" in dataset_name:
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
     num_epochs = 500  # 500
-    lr = start_lr  # 0.001
+    lr = 0.01  # 0.001
     save_dir = "./work_dirs/endovis_2018/"
 
 # elif "17" in dataset_name:
@@ -195,9 +193,7 @@ optimiser = torch.optim.Adam(
 
 # Define the scheduler
 # scheduler = ExponentialLR(optimiser, gamma=0.95)  # Adjust gamma to your needs
-scheduler = LinearLR(
-    optimizer=optimiser, start_factor=start_lr, end_factor=end_lr, last_epoch=150
-)
+scheduler = LinearLR(optimizer=optimiser, start_factor=0.95, total_iters=150)
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
@@ -287,8 +283,6 @@ for epoch in range(num_epochs):
         optimiser.zero_grad()
         loss.backward()
         optimiser.step()
-
-    # EXP optimierser step
 
     # validation
     binary_masks = dict()
