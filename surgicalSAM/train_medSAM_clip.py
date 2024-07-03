@@ -80,7 +80,7 @@ if "18" in dataset_name:
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
     num_epochs = 500  # 500
-    lr = 0.01  # 0.001
+    lr = 0.05  # 0.001
     save_dir = "./work_dirs/endovis_2018/"
 
 # elif "17" in dataset_name:
@@ -193,7 +193,9 @@ optimiser = torch.optim.Adam(
 
 # Define the scheduler
 # scheduler = ExponentialLR(optimiser, gamma=0.95)  # Adjust gamma to your needs
-scheduler = LinearLR(optimizer=optimiser, start_factor=0.95, total_iters=150)
+scheduler = LinearLR(
+    optimizer=optimiser, start_factor=1, end_factor=0.02, total_iters=200
+)
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
