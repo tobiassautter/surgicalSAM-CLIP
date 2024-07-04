@@ -25,7 +25,13 @@ from datetime import datetime
 
 # Exponantial LR
 from torch.optim.lr_scheduler import ExponentialLR
+from torch.optim.lr_scheduler import LinearLR
 
+## logger
+import wandb_logger
+
+## import clip_model_emb.py
+import tools.clip_model_emb as clip_model_emb
 
 print("======> Process Arguments")
 parser = argparse.ArgumentParser()
@@ -49,10 +55,13 @@ print("======> Set Parameters for Training")
 dataset_name = args.dataset
 fold = args.fold
 thr = 0
-seed = 666  # 666
-data_root_dir = f"../data/{dataset_name}"
-batch_size = 32
-vit_mode = "h"
+seed = 123  # 666
+data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
+batch_size = 16  # 32  # 32
+vit_mode = "h"  # "h"
+# for logger
+w_project_name = "surgicalSAM - Endovis 2018 - SSAM"
+c_loss_temp = 0.07
 
 # set seed for reproducibility
 random.seed(seed)
@@ -70,31 +79,30 @@ if "18" in dataset_name:
     )
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
-    num_epochs = 300  # 500
-    lr = 0.001  # 0.001
+    num_epochs = 100  # 500
+    lr = 0.002  # 0.001
     save_dir = "./work_dirs/endovis_2018/"
 
-elif "17" in dataset_name:
-    num_tokens = 4
-    val_dataset = Endovis17Dataset(
-        data_root_dir=data_root_dir, mode="val", fold=fold, vit_mode="h", version=0
-    )
-
-    gt_endovis_masks = read_gt_endovis_masks(
-        data_root_dir=data_root_dir, mode="val", fold=fold
-    )
-    num_epochs = 2000
-    lr = 0.0001
-    save_dir = f"./work_dirs/endovis_2017/{fold}"
+# elif "17" in dataset_name:
+#    num_tokens = 4
+#    val_dataset = Endovis17Dataset(
+#        data_root_dir=data_root_dir, mode="val", fold=fold, vit_mode="h", version=0
+#    )
+#
+#    gt_endovis_masks = read_gt_endovis_masks(
+#        data_root_dir=data_root_dir, mode="val", fold=fold
+#    )
+#    num_epochs = 2000
+#    lr = 0.0001
+#    save_dir = f"./work_dirs/endovis_2017/{fold}"
 
 val_dataloader = DataLoader(
-    val_dataset, batch_size=batch_size, shuffle=True, num_workers=4
+    val_dataset, batch_size=batch_size, shuffle=True, num_workers=2
 )
 
 print("======> Load SAM")
 if vit_mode == "h":
     sam_checkpoint = "../ckp/sam/sam_vit_h_4b8939.pth"
-
 print("Checkpoint: ", sam_checkpoint)
 model_type = "vit_h_no_image_encoder"
 
@@ -111,8 +119,15 @@ for name, param in sam_prompt_encoder.named_parameters():
 for name, param in sam_decoder.named_parameters():
     param.requires_grad = True
 
+# load clip embeddings
+# print("======> Load CLIP Embeddings")
+# clip_emb = clip_model_emb.get_emb(output_dim=256)
+
 print("======> Load Prototypes and Prototype-based Prompt Encoder")
-learnable_prototypes_model = Learnable_Prototypes(num_classes=7, feat_dim=256).cuda()
+learnable_prototypes_model = Learnable_Prototypes(
+    num_classes=7, feat_dim=256  # , clip_embeddings=clip_emb
+).cuda()
+
 protoype_prompt_encoder = Prototype_Prompt_Encoder(
     feat_dim=256,
     hidden_dim_dense=128,
@@ -152,7 +167,7 @@ for name, param in protoype_prompt_encoder.named_parameters():
 
 print("======> Define Optmiser and Loss")
 seg_loss_model = DiceLoss().cuda()
-contrastive_loss_model = losses.NTXentLoss(temperature=0.07).cuda()
+contrastive_loss_model = losses.NTXentLoss(temperature=c_loss_temp).cuda()  # 0.07
 
 # change to AdamW
 # optimiser = torch.optim.Adam(
@@ -172,20 +187,36 @@ optimiser = torch.optim.Adam(
         {"params": sam_decoder.parameters()},
     ],
     lr=lr,
-    weight_decay=0.0001 #0.0001,
+    weight_decay=0.0001,  # 0.0001,
 )
 
 # Define the scheduler
-#scheduler = ExponentialLR(optimiser, gamma=0.9)  # Adjust gamma to your needs
+# scheduler = ExponentialLR(optimiser, gamma=0.95)  # Adjust gamma to your needs
+# scheduler = LinearLR(
+#     optimizer=optimiser, start_factor=1, end_factor=0.02, total_iters=200
+# )
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
-log_file = osp.join(save_dir, "log.txt")
+log_file = osp.join(save_dir, "log_clip_SS.txt")
 print_log(str(args), log_file)
-
 
 print("======> Start Training and Validation")
 best_challenge_iou_val = -100.0
+
+# for logging
+print("======> Initialize wandb")
+wandb_logger.init(
+    project=w_project_name,
+    config={
+        "learning_rate": lr,
+        "architecture": "SSAM - orig",
+        "dataset": dataset_name,
+        "epochs": num_epochs,
+        "temperature": c_loss_temp,
+        "batch_size": batch_size,
+    },
+)
 
 for epoch in range(num_epochs):
 
@@ -254,9 +285,6 @@ for epoch in range(num_epochs):
         loss.backward()
         optimiser.step()
 
-    # EXP optimierser step
-    #scheduler.step()
-
     # validation
     binary_masks = dict()
     protoype_prompt_encoder.eval()
@@ -287,6 +315,10 @@ for epoch in range(num_epochs):
     endovis_masks = create_endovis_masks(binary_masks, 1024, 1280)
     endovis_results = eval_endovis(endovis_masks, gt_endovis_masks)
 
+    # scheduler step after val
+    # print(f"Updated learning rate: {scheduler.get_last_lr()}")
+    # scheduler.step()
+
     # print validation results in log
     print_log(
         f"Validation - Epoch: {epoch}/{num_epochs-1}; IoU_Results: {endovis_results} ",
@@ -297,6 +329,8 @@ for epoch in range(num_epochs):
         f"Timestamp: {datetime.now()} -----------------------------------------------",
         log_file,
     )
+    # log results to wandb
+    wandb_logger.log_results(endovis_results)
 
     # save the model with the best challenge IoU
     if endovis_results["challengIoU"] > best_challenge_iou_val:
@@ -308,10 +342,13 @@ for epoch in range(num_epochs):
                 "sam_decoder_state_dict": sam_decoder.state_dict(),
                 "prototypes_state_dict": learnable_prototypes_model.state_dict(),
             },
-            osp.join(save_dir, "model_ckp.pth"),
+            osp.join(save_dir, "model_ckp_SSAM.pth"),
         )
 
         print_log(
             f"Best Challenge IoU: {best_challenge_iou_val:.4f} at Epoch {epoch}",
             log_file,
         )
+
+# close wandb
+wandb_logger.close()
