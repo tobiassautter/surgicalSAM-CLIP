@@ -52,21 +52,34 @@ class Prototype_Prompt_Encoder(nn.Module):
         one_hot = torch.nn.functional.one_hot(cls_ids, 7).to(feat.device)
 
         # Debugging shapes before reshaping
-        print(f"feat_dense shape before reshape: {feat_dense.shape}")
-        print(f"one_hot shape: {one_hot.shape}")
+        print(
+            f"feat_dense shape before reshape: {feat_dense.shape}"
+        )  # [16, 16, 4096, 256]
+        print(f"one_hot shape: {one_hot.shape}")  # [16, 7]
 
         # Ensuring that one_hot matches feat_dense shape for indexing
         feat_dense = rearrange(feat_dense, "b num_cls hw c -> b hw num_cls c")
         one_hot = rearrange(one_hot, "b n -> b 1 n").bool()
 
         # Debugging shapes after reshaping
-        print(f"feat_dense shape after reshape: {feat_dense.shape}")
-        print(f"one_hot shape after reshape: {one_hot.shape}")
+        print(
+            f"feat_dense shape after reshape: {feat_dense.shape}"
+        )  # [16, 4096, 16, 256]
+        print(f"one_hot shape after reshape: {one_hot.shape}")  # [16, 1, 7]
+
+        # Verify content of one_hot tensor for debugging
+        print(f"one_hot tensor content: {one_hot}")
 
         # Select features for the given classes
-        selected_feat_dense = torch.masked_select(
-            feat_dense, one_hot.unsqueeze(-1)
-        ).view(feat_dense.size(0), -1, 64, 64, 256)
+        try:
+            selected_feat_dense = torch.masked_select(
+                feat_dense, one_hot.unsqueeze(-1)
+            ).view(feat_dense.size(0), -1, 64, 64, 256)
+        except RuntimeError as e:
+            print(f"Error during masked_select: {e}")
+            print(f"feat_dense shape during error: {feat_dense.shape}")
+            print(f"one_hot shape during error: {one_hot.unsqueeze(-1).shape}")
+            raise e
 
         # Debugging shape after selection and rearrange
         print(f"selected_feat_dense shape: {selected_feat_dense.shape}")
