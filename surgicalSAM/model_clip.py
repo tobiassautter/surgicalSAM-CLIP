@@ -57,41 +57,32 @@ class Prototype_Prompt_Encoder(nn.Module):
         )  # [16, 16, 4096, 256]
         print(f"one_hot shape: {one_hot.shape}")  # [16, 7]
 
-        # Ensure one_hot matches feat_dense shape for indexing
+        # Ensuring that one_hot matches feat_dense shape for indexing
         feat_dense = rearrange(feat_dense, "b num_cls hw c -> b hw num_cls c")
-        one_hot = rearrange(one_hot, "b n -> b 1 n 1").bool()
+        one_hot = rearrange(one_hot, "b n -> b 1 n").bool()
 
         # Debugging shapes after reshaping
         print(
             f"feat_dense shape after reshape: {feat_dense.shape}"
         )  # [16, 4096, 16, 256]
-        print(f"one_hot shape after reshape: {one_hot.shape}")  # [16, 1, 7, 1]
+        print(f"one_hot shape after reshape: {one_hot.shape}")  # [16, 1, 7]
 
-        # Verify content of one_hot tensor for debugging
-        print(f"one_hot tensor content: {one_hot}")
-
-        # Expand one_hot to match feat_dense for masking
-        one_hot_expanded = one_hot.expand(
-            -1, feat_dense.size(1), -1, feat_dense.size(3)
+        # Gather features based on class IDs
+        gathered_feat_dense = torch.gather(
+            feat_dense,
+            2,
+            one_hot.expand(-1, feat_dense.size(1), -1, feat_dense.size(3)).long(),
         )
-        print(f"one_hot_expanded shape: {one_hot_expanded.shape}")  # [16, 4096, 7, 256]
 
-        # Select features for the given classes
-        try:
-            selected_feat_dense = torch.masked_select(
-                feat_dense, one_hot_expanded
-            ).view(feat_dense.size(0), -1, 64, 64, 256)
-        except RuntimeError as e:
-            print(f"Error during masked_select: {e}")
-            print(f"feat_dense shape during error: {feat_dense.shape}")
-            print(f"one_hot_expanded shape during error: {one_hot_expanded.shape}")
-            raise e
+        # Debugging shape after gathering
+        print(
+            f"gathered_feat_dense shape: {gathered_feat_dense.shape}"
+        )  # Should match [16, 4096, 7, 256]
 
-        # Debugging shape after selection and rearrange
-        print(f"selected_feat_dense shape: {selected_feat_dense.shape}")
+        gathered_feat_dense = rearrange(gathered_feat_dense, "b hw n c -> (b n) c hw")
 
         dense_embeddings = self.dense_fc_2(
-            self.relu(self.dense_fc_1(selected_feat_dense))
+            self.relu(self.dense_fc_1(gathered_feat_dense))
         )
 
         # Process for sparse embeddings
@@ -103,10 +94,10 @@ class Prototype_Prompt_Encoder(nn.Module):
 
         pos_embed = self.pn_cls_embeddings[1].weight.unsqueeze(0).unsqueeze(
             0
-        ) * one_hot.squeeze(3).unsqueeze(-1)
+        ) * one_hot.unsqueeze(-1).unsqueeze(-1)
         neg_embed = self.pn_cls_embeddings[0].weight.unsqueeze(0).unsqueeze(0) * (
-            1 - one_hot.squeeze(3)
-        ).unsqueeze(-1)
+            1 - one_hot
+        ).unsqueeze(-1).unsqueeze(-1)
 
         sparse_embeddings = sparse_embeddings + pos_embed.detach() + neg_embed.detach()
 
