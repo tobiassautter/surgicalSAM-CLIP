@@ -69,7 +69,7 @@ class Prototype_Prompt_Encoder(nn.Module):
 
         # Expand one_hot to match the dimensions of feat_dense
         one_hot_expanded = one_hot.expand(
-            feat_dense.size(0), feat_dense.size(1), one_hot.size(2), feat_dense.size(3)
+            -1, feat_dense.size(1), one_hot.size(2), feat_dense.size(3)
         )
 
         # Debugging shape after expanding
