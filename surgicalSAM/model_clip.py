@@ -12,7 +12,6 @@ class Prototype_Prompt_Encoder(nn.Module):
         size=64,
         num_tokens=8,
     ):
-
         super(Prototype_Prompt_Encoder, self).__init__()
         self.dense_fc_1 = nn.Conv2d(feat_dim, hidden_dim_dense, 1)
         self.dense_fc_2 = nn.Conv2d(hidden_dim_dense, feat_dim, 1)
@@ -23,37 +22,40 @@ class Prototype_Prompt_Encoder(nn.Module):
         self.sparse_fc_2 = nn.Conv1d(hidden_dim_sparse, num_tokens, 1)
 
         pn_cls_embeddings = [
-            nn.Embedding(num_tokens, feat_dim) for _ in range(2)
-        ]  # one for positive and one for negative
-
+            nn.Embedding(num_tokens, feat_dim)
+            for _ in range(2)  # One for positive and one for negative
+        ]
         self.pn_cls_embeddings = nn.ModuleList(pn_cls_embeddings)
 
     def forward(self, feat, prototypes, cls_ids):
-        print(f"Initial feat shape: {feat.shape}")
-        print(f"Prototypes shape: {prototypes.shape}")
-        print(f"cls_ids shape: {cls_ids.shape}")
-
-        cls_prompts = prototypes.unsqueeze(-1)
+        # Ensuring prototypes are on the same device as feat
+        cls_prompts = prototypes.unsqueeze(-1).to(feat.device)
         cls_prompts = torch.stack([cls_prompts for _ in range(feat.size(0))], dim=0)
 
-        feat = torch.stack([feat for _ in range(cls_prompts.size(1))], dim=1)
+        # Debugging device assignment
+        print(f"Device of feat: {feat.device}")
+        print(f"Device of cls_prompts: {cls_prompts.device}")
 
-        # compute similarity matrix
-        sim = torch.matmul(feat, cls_prompts)
+        # Expanding feat to match cls_prompts dimensions and ensuring device consistency
+        feat_expanded = torch.stack(
+            [feat for _ in range(cls_prompts.size(1))], dim=1
+        ).to(feat.device)
 
-        # compute class-activated feature
-        feat = feat + feat * sim
+        # Compute similarity matrix
+        sim = torch.matmul(feat_expanded, cls_prompts)
 
-        feat_sparse = feat.clone()
+        # Compute class-activated feature
+        feat = feat_expanded + feat_expanded * sim
 
-        # compute dense embeddings
-        one_hot = torch.nn.functional.one_hot(cls_ids - 1, 7)
-        feat = feat[one_hot == 1]
-        feat = rearrange(feat, "b (h w) c -> b c h w", h=64, w=64)
-        dense_embeddings = self.dense_fc_2(self.relu(self.dense_fc_1(feat)))
+        # Process for dense embeddings
+        feat_dense = feat.clone()
+        one_hot = torch.nn.functional.one_hot(cls_ids - 1, 7).to(feat.device)
+        feat_dense = feat_dense[one_hot == 1]
+        feat_dense = rearrange(feat_dense, "b (h w) c -> b c h w", h=64, w=64)
+        dense_embeddings = self.dense_fc_2(self.relu(self.dense_fc_1(feat_dense)))
 
-        # compute sparse embeddings
-        feat_sparse = rearrange(feat_sparse, "b num_cls hw c -> (b num_cls) hw c")
+        # Process for sparse embeddings
+        feat_sparse = rearrange(feat, "b num_cls hw c -> (b num_cls) hw c")
         sparse_embeddings = self.sparse_fc_2(self.relu(self.sparse_fc_1(feat_sparse)))
         sparse_embeddings = rearrange(
             sparse_embeddings, "(b num_cls) n c -> b num_cls n c", num_cls=7
