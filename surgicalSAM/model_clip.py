@@ -77,20 +77,27 @@ class Prototype_Prompt_Encoder(nn.Module):
             f"one_hot_expanded shape: {one_hot_expanded.shape}"
         )  # Should match [16, 4096, 7, 256]
 
-        selected_feat_dense = feat_dense.masked_select(one_hot_expanded).view(
-            feat_dense.size(0), -1, feat_dense.size(1), feat_dense.size(3)
-        )
+        try:
+            selected_feat_dense = feat_dense.masked_select(one_hot_expanded).view(
+                feat_dense.size(0), -1, feat_dense.size(1), feat_dense.size(3)
+            )
 
-        # Debugging shape after selection
-        print(
-            f"selected_feat_dense shape: {selected_feat_dense.shape}"
-        )  # Should match [16, 7, 4096, 256]
+            # Debugging shape after selection
+            print(
+                f"selected_feat_dense shape: {selected_feat_dense.shape}"
+            )  # Should match [16, 7, 4096, 256]
 
-        selected_feat_dense = rearrange(selected_feat_dense, "b n hw c -> (b n) c hw")
-
-        dense_embeddings = self.dense_fc_2(
-            self.relu(self.dense_fc_1(selected_feat_dense))
-        )
+            selected_feat_dense = rearrange(
+                selected_feat_dense, "b n hw c -> (b n) c hw"
+            )
+            dense_embeddings = self.dense_fc_2(
+                self.relu(self.dense_fc_1(selected_feat_dense))
+            )
+        except RuntimeError as e:
+            print(f"Error during masked_select: {str(e)}")
+            print(f"feat_dense shape during error: {feat_dense.shape}")
+            print(f"one_hot_expanded shape during error: {one_hot_expanded.shape}")
+            raise e
 
         # Process for sparse embeddings
         feat_sparse = rearrange(feat, "b num_cls hw c -> (b num_cls) hw c")
