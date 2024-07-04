@@ -30,16 +30,16 @@ class CLIPEmbeddings:
         # Define the surgical instruments
         self.instrument_details = {
             # Fill this dictionary as previously detailed
-            "background": [
-                "background",
-                "the area represented by the background tissues.",
-                "background tissues are the tissues that surround the surgical site.",
-            ],
-            "instrument": [
-                "instrument",
-                "the area represented by the instrument.",
-                "instruments in endoscopic surgery typically exhibit elongated designs, specialized tips or jaws for specific functions, ergonomic handles for precise control, and insulated shafts to minimize energy transmission or tissue damage.",
-            ],
+            # "background": [
+            #     "background",
+            #     "the area represented by the background tissues.",
+            #     "background tissues are the tissues that surround the surgical site.",
+            # ],
+            # "instrument": [
+            #     "instrument",
+            #     "the area represented by the instrument.",
+            #     "instruments in endoscopic surgery typically exhibit elongated designs, specialized tips or jaws for specific functions, ergonomic handles for precise control, and insulated shafts to minimize energy transmission or tissue damage.",
+            # ],
             "bipolar_forceps": [
                 "bipolar forceps",
                 "the area represented by the bipolar forceps.",
