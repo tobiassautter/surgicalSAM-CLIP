@@ -55,12 +55,12 @@ print("======> Set Parameters for Training")
 dataset_name = args.dataset
 fold = args.fold
 thr = 0
-seed = 666  # 666
+seed = 123  # 666
 data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
 batch_size = 16  # 32  # 32
 vit_mode = "h"  # "h"
 # for logger
-w_project_name = "surgicalSAM - Endovis 2018 - SAM_init_clip"
+w_project_name = "surgicalSAM - Endovis 2018 - SSAM_init_clip"
 c_loss_temp = 0.07
 
 # set seed for reproducibility
@@ -79,8 +79,8 @@ if "18" in dataset_name:
     )
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
-    num_epochs = 500  # 500
-    lr = 0.001  # 0.001
+    num_epochs = 100  # 500
+    lr = 0.002  # 0.001
     save_dir = "./work_dirs/endovis_2018/"
 
 # elif "17" in dataset_name:
@@ -210,7 +210,7 @@ wandb_logger.init(
     project=w_project_name,
     config={
         "learning_rate": lr,
-        "architecture": "MedSAM - Clip Init",
+        "architecture": "SSAM - Clip Init",
         "dataset": dataset_name,
         "epochs": num_epochs,
         "temperature": c_loss_temp,
@@ -342,7 +342,7 @@ for epoch in range(num_epochs):
                 "sam_decoder_state_dict": sam_decoder.state_dict(),
                 "prototypes_state_dict": learnable_prototypes_model.state_dict(),
             },
-            osp.join(save_dir, "model_ckp_SS_clip.pth"),
+            osp.join(save_dir, "model_ckp_SSAM_clip.pth"),
         )
 
         print_log(
