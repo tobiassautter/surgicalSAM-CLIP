@@ -49,9 +49,18 @@ class Prototype_Prompt_Encoder(nn.Module):
 
         # Process for dense embeddings
         feat_dense = feat.clone()
-        one_hot = torch.nn.functional.one_hot(cls_ids - 1, 7).to(feat.device)
-        feat_dense = feat_dense[one_hot == 1]
-        feat_dense = rearrange(feat_dense, "b (h w) c -> b c h w", h=64, w=64)
+        one_hot = torch.nn.functional.one_hot(cls_ids, 7).to(feat.device)
+
+        # Reshape one_hot to match feat_dense for indexing
+        one_hot = one_hot.view(one_hot.size(0), one_hot.size(1), 1, 1).expand(
+            -1, -1, feat_dense.size(2), feat_dense.size(3)
+        )
+
+        # Select features for the given classes
+        feat_dense = torch.masked_select(feat_dense, one_hot.unsqueeze(-1)).view(
+            one_hot.size(0), -1, feat_dense.size(2), feat_dense.size(3)
+        )
+        feat_dense = rearrange(feat_dense, "b c h w -> b c h w", h=64, w=64)
         dense_embeddings = self.dense_fc_2(self.relu(self.dense_fc_1(feat_dense)))
 
         # Process for sparse embeddings
