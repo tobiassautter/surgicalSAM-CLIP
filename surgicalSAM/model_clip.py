@@ -28,7 +28,7 @@ class Prototype_Prompt_Encoder(nn.Module):
         self.pn_cls_embeddings = nn.ModuleList(pn_cls_embeddings)
 
     def forward(self, feat, prototypes, cls_ids):
-        # Ensuring prototypes are on the same device as feat
+        # Ensure prototypes and features are on the same device
         cls_prompts = prototypes.unsqueeze(-1).to(feat.device)
         cls_prompts = torch.stack([cls_prompts for _ in range(feat.size(0))], dim=0)
 
@@ -57,7 +57,7 @@ class Prototype_Prompt_Encoder(nn.Module):
         )  # [16, 16, 4096, 256]
         print(f"one_hot shape: {one_hot.shape}")  # [16, 7]
 
-        # Ensuring that one_hot matches feat_dense shape for indexing
+        # Ensure one_hot matches feat_dense shape for indexing
         feat_dense = rearrange(feat_dense, "b num_cls hw c -> b hw num_cls c")
         one_hot = rearrange(one_hot, "b n -> b 1 n 1").bool()
 
