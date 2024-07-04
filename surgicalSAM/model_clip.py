@@ -49,7 +49,7 @@ class Prototype_Prompt_Encoder(nn.Module):
 
         # Process for dense embeddings
         feat_dense = feat.clone()
-        one_hot = torch.nn.functional.one_hot(cls_ids, 7).to(feat.device)
+        one_hot = torch.nn.functional.one_hot(cls_ids, num_classes=7).to(feat.device)
 
         # Debugging shapes before reshaping
         print(
