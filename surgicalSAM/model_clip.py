@@ -49,14 +49,16 @@ class Prototype_Prompt_Encoder(nn.Module):
 
         # Process for dense embeddings
         feat_dense = feat.clone()
-        one_hot = torch.nn.functional.one_hot(cls_ids, 7).to(feat.device).bool()
+        one_hot = torch.nn.functional.one_hot(cls_ids, 7).to(feat.device)
 
         # Debugging shapes before reshaping
         print(f"feat_dense shape before reshape: {feat_dense.shape}")
         print(f"one_hot shape: {one_hot.shape}")
 
         # Ensure that one_hot matches feat_dense shape for indexing
-        feat_dense = feat_dense.view(-1, feat_dense.size(-2), feat_dense.size(-1))
+        feat_dense = feat_dense.view(
+            feat_dense.size(0) * feat_dense.size(1), -1, feat_dense.size(-1)
+        )
         one_hot = one_hot.view(-1)
 
         # Debugging shapes after reshaping
@@ -64,8 +66,11 @@ class Prototype_Prompt_Encoder(nn.Module):
         print(f"one_hot shape after reshape: {one_hot.shape}")
 
         # Select features for the given classes
-        feat_dense = feat_dense[one_hot]
-        feat_dense = rearrange(feat_dense, "(b c) h w -> b c h w", b=cls_ids.size(0))
+        feat_dense = (
+            feat_dense[one_hot]
+            .view(feat_dense.size(0) // 7, -1, 64, 64, 256)
+            .permute(0, 2, 3, 4, 1)
+        )
 
         # Debugging shape after selection and rearrange
         print(f"feat_dense shape after selection: {feat_dense.shape}")
