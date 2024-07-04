@@ -89,16 +89,18 @@ sam_prompt_encoder, sam_decoder = sam_model_registry[model_type](
 sam_prompt_encoder.cuda()
 sam_decoder.cuda()
 
-# load clip embeddings -------------------------------------------------------------
+# Load CLIP Embeddings
 print("======> Load CLIP Embeddings")
 clip_embeddings_handler = cl_em_dt.CLIPEmbeddings()
 fixed_prototypes = clip_embeddings_handler.get_embeddings()
 print("Number of CLIP embeddings:", fixed_prototypes.shape[0])
 
-# Setup the learnable prototypes and encoder with fixed prototypes ----------------
+# Setup the learnable prototypes and encoder with fixed prototypes
 print("======> Load Prototypes and Prototype-based Prompt Encoder")
 learnable_prototypes_model = Learnable_Prototypes(
-    num_classes=7, feat_dim=256, clip_embeddings=fixed_prototypes
+    num_classes=fixed_prototypes.shape[0],
+    feat_dim=fixed_prototypes.shape[1],
+    clip_embeddings=fixed_prototypes,
 ).cuda()
 
 protoype_prompt_encoder = Prototype_Prompt_Encoder(
@@ -110,6 +112,7 @@ protoype_prompt_encoder = Prototype_Prompt_Encoder(
 ).cuda()
 
 # Ensure all parameters except the decoder are not trainable -----------------------
+print("======> Set Parameters to be Trained")
 for param in learnable_prototypes_model.parameters():
     param.requires_grad = False
 for param in protoype_prompt_encoder.parameters():
@@ -219,7 +222,11 @@ for epoch in range(num_epochs):
             class_embeddings.cuda(),
         )
         # Print cls_ids to verify correct batch data
-        print(f"Current batch cls_ids: {cls_ids}")
+        print("Current batch cls_ids:", cls_ids)
+        print("Prototypes selected for current batch:", prototypes.shape)
+        print("sam_feats shape:", sam_feats.shape)
+        print("prototypes shape:", prototypes.shape)
+        print("cls_ids:", cls_ids)
 
         # Ensuring the use of correct prototypes for each class ID
         prototypes = fixed_prototypes[cls_ids]

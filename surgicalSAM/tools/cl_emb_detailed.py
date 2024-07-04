@@ -29,17 +29,6 @@ class CLIPEmbeddings:
 
         # Define the surgical instruments
         self.instrument_details = {
-            # Fill this dictionary as previously detailed
-            # "background": [
-            #     "background",
-            #     "the area represented by the background tissues.",
-            #     "background tissues are the tissues that surround the surgical site.",
-            # ],
-            # "instrument": [
-            #     "instrument",
-            #     "the area represented by the instrument.",
-            #     "instruments in endoscopic surgery typically exhibit elongated designs, specialized tips or jaws for specific functions, ergonomic handles for precise control, and insulated shafts to minimize energy transmission or tissue damage.",
-            # ],
             "bipolar_forceps": [
                 "bipolar forceps",
                 "the area represented by the bipolar forceps.",
@@ -79,9 +68,10 @@ class CLIPEmbeddings:
 
     def get_embeddings(self):
         # Prepare detailed descriptions for embedding generation
-        detailed_descriptions = [
-            desc[-1] for desc in self.instrument_details.values()
-        ]  # Assuming the last description is the most detailed
+        detailed_descriptions = []
+        for key, descs in self.instrument_details.items():
+            for desc in descs:
+                detailed_descriptions.append(desc)
 
         # Tokenize and encode the detailed descriptions
         inputs = self.clip_processor(
@@ -96,4 +86,10 @@ class CLIPEmbeddings:
         # Project CLIP embeddings to the desired dimension
         projected_features = self.projection_layer(text_features)
 
-        return projected_features
+        # Average the embeddings for each instrument
+        num_descs_per_instrument = 3  # Assuming there are 3 descriptions per instrument
+        averaged_features = projected_features.view(
+            len(self.instrument_details), num_descs_per_instrument, -1
+        ).mean(dim=1)
+
+        return averaged_features
