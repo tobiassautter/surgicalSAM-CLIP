@@ -221,16 +221,17 @@ for epoch in range(num_epochs):
             masks.cuda(),
             class_embeddings.cuda(),
         )
+
+        # Ensuring the use of correct prototypes for each class ID
+        prototypes = fixed_prototypes[cls_ids]
+        print(f"Prototypes selected for current batch: {prototypes.shape}")
+
         # Print cls_ids to verify correct batch data
         print("Current batch cls_ids:", cls_ids)
         print("Prototypes selected for current batch:", prototypes.shape)
         print("sam_feats shape:", sam_feats.shape)
         print("prototypes shape:", prototypes.shape)
         print("cls_ids:", cls_ids)
-
-        # Ensuring the use of correct prototypes for each class ID
-        prototypes = fixed_prototypes[cls_ids]
-        print(f"Prototypes selected for current batch: {prototypes.shape}")
 
         preds, _ = model_forward_function(
             protoype_prompt_encoder,
