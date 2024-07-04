@@ -29,6 +29,9 @@ class Prototype_Prompt_Encoder(nn.Module):
         self.pn_cls_embeddings = nn.ModuleList(pn_cls_embeddings)
 
     def forward(self, feat, prototypes, cls_ids):
+        print(f"Initial feat shape: {feat.shape}")
+        print(f"Prototypes shape: {prototypes.shape}")
+        print(f"cls_ids shape: {cls_ids.shape}")
 
         cls_prompts = prototypes.unsqueeze(-1)
         cls_prompts = torch.stack([cls_prompts for _ in range(feat.size(0))], dim=0)
@@ -78,7 +81,11 @@ class Learnable_Prototypes(nn.Module):
         self.class_embeddings = nn.Embedding(num_classes, feat_dim)
         # initialize the class embeddings with the clip embeddings
         if clip_embeddings is not None:
+            print("Initializing prototypes with CLIP embeddings.")
             self.class_embeddings.weight.data.copy_(clip_embeddings)
+            self.class_embeddings.weight.requires_grad = (
+                False  # Ensuring they are not trainable
+            )
 
     def forward(self):
         return self.class_embeddings.weight
