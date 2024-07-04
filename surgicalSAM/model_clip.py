@@ -59,18 +59,14 @@ class Prototype_Prompt_Encoder(nn.Module):
         feat_dense = feat_dense.view(
             feat_dense.size(0) * feat_dense.size(1), -1, feat_dense.size(-1)
         )
-        one_hot = one_hot.view(-1)
+        one_hot = one_hot.view(feat_dense.size(0), -1).bool()
 
         # Debugging shapes after reshaping
         print(f"feat_dense shape after reshape: {feat_dense.shape}")
         print(f"one_hot shape after reshape: {one_hot.shape}")
 
         # Select features for the given classes
-        feat_dense = (
-            feat_dense[one_hot]
-            .view(feat_dense.size(0) // 7, -1, 64, 64, 256)
-            .permute(0, 2, 3, 4, 1)
-        )
+        feat_dense = feat_dense[one_hot].view(feat_dense.size(0) // 7, -1, 64, 64, 256)
 
         # Debugging shape after selection and rearrange
         print(f"feat_dense shape after selection: {feat_dense.shape}")
