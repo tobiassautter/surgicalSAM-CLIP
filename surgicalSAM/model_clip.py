@@ -55,7 +55,7 @@ class Prototype_Prompt_Encoder(nn.Module):
         print(f"feat_dense shape before reshape: {feat_dense.shape}")
         print(f"one_hot shape: {one_hot.shape}")
 
-        # Ensure that one_hot matches feat_dense shape for indexing
+        # Ensuring that one_hot matches feat_dense shape for indexing
         feat_dense = rearrange(feat_dense, "b num_cls hw c -> b hw num_cls c")
         one_hot = rearrange(one_hot, "b n -> b 1 n").bool()
 
@@ -64,7 +64,9 @@ class Prototype_Prompt_Encoder(nn.Module):
         print(f"one_hot shape after reshape: {one_hot.shape}")
 
         # Select features for the given classes
-        selected_feat_dense = feat_dense.masked_select(one_hot).view(-1, 64, 64, 256)
+        selected_feat_dense = torch.masked_select(
+            feat_dense, one_hot.unsqueeze(-1)
+        ).view(feat_dense.size(0), -1, 64, 64, 256)
 
         # Debugging shape after selection and rearrange
         print(f"selected_feat_dense shape: {selected_feat_dense.shape}")
@@ -82,9 +84,9 @@ class Prototype_Prompt_Encoder(nn.Module):
 
         pos_embed = self.pn_cls_embeddings[1].weight.unsqueeze(0).unsqueeze(
             0
-        ) * one_hot.view(cls_ids.size(0), -1, 1).unsqueeze(-1)
+        ) * one_hot.unsqueeze(-1).unsqueeze(-1)
         neg_embed = self.pn_cls_embeddings[0].weight.unsqueeze(0).unsqueeze(0) * (
-            1 - one_hot.view(cls_ids.size(0), -1, 1)
+            1 - one_hot
         ).unsqueeze(-1).unsqueeze(-1)
 
         sparse_embeddings = sparse_embeddings + pos_embed.detach() + neg_embed.detach()
