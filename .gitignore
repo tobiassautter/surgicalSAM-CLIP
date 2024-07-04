@@ -47,3 +47,5 @@ work_dirs/
 /ENV_SAM
 ENV/
 surgicalSAM/wandb/
+wandb/
+surgicalSAM/wandb
