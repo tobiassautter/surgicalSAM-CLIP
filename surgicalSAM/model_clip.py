@@ -59,26 +59,26 @@ class Prototype_Prompt_Encoder(nn.Module):
 
         # Ensuring that one_hot matches feat_dense shape for indexing
         feat_dense = rearrange(feat_dense, "b num_cls hw c -> b hw num_cls c")
-        one_hot = rearrange(one_hot, "b n -> b 1 n").bool()
+        one_hot = rearrange(one_hot, "b n -> b 1 n 1").bool()
 
         # Debugging shapes after reshaping
         print(
             f"feat_dense shape after reshape: {feat_dense.shape}"
         )  # [16, 4096, 16, 256]
-        print(f"one_hot shape after reshape: {one_hot.shape}")  # [16, 1, 7]
+        print(f"one_hot shape after reshape: {one_hot.shape}")  # [16, 1, 7, 1]
 
         # Verify content of one_hot tensor for debugging
         print(f"one_hot tensor content: {one_hot}")
 
         # Select features for the given classes
         try:
-            selected_feat_dense = torch.masked_select(
-                feat_dense, one_hot.unsqueeze(-1)
-            ).view(feat_dense.size(0), -1, 64, 64, 256)
+            selected_feat_dense = torch.masked_select(feat_dense, one_hot).view(
+                feat_dense.size(0), 64, 64, 256
+            )
         except RuntimeError as e:
             print(f"Error during masked_select: {e}")
             print(f"feat_dense shape during error: {feat_dense.shape}")
-            print(f"one_hot shape during error: {one_hot.unsqueeze(-1).shape}")
+            print(f"one_hot shape during error: {one_hot.shape}")
             raise e
 
         # Debugging shape after selection and rearrange
@@ -97,10 +97,10 @@ class Prototype_Prompt_Encoder(nn.Module):
 
         pos_embed = self.pn_cls_embeddings[1].weight.unsqueeze(0).unsqueeze(
             0
-        ) * one_hot.unsqueeze(-1).unsqueeze(-1)
+        ) * one_hot.squeeze(3).unsqueeze(-1)
         neg_embed = self.pn_cls_embeddings[0].weight.unsqueeze(0).unsqueeze(0) * (
-            1 - one_hot
-        ).unsqueeze(-1).unsqueeze(-1)
+            1 - one_hot.squeeze(3)
+        ).unsqueeze(-1)
 
         sparse_embeddings = sparse_embeddings + pos_embed.detach() + neg_embed.detach()
 
