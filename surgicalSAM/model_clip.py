@@ -51,15 +51,25 @@ class Prototype_Prompt_Encoder(nn.Module):
         feat_dense = feat.clone()
         one_hot = torch.nn.functional.one_hot(cls_ids, 7).to(feat.device).bool()
 
+        # Debugging shapes before reshaping
+        print(f"feat_dense shape before reshape: {feat_dense.shape}")
+        print(f"one_hot shape: {one_hot.shape}")
+
         # Ensure that one_hot matches feat_dense shape for indexing
-        feat_dense = feat_dense.view(
-            feat_dense.size(0) * feat_dense.size(1), *feat_dense.size()[2:]
-        )
-        one_hot = one_hot.view(one_hot.size(0) * one_hot.size(1))
+        feat_dense = feat_dense.view(-1, feat_dense.size(-2), feat_dense.size(-1))
+        one_hot = one_hot.view(-1)
+
+        # Debugging shapes after reshaping
+        print(f"feat_dense shape after reshape: {feat_dense.shape}")
+        print(f"one_hot shape after reshape: {one_hot.shape}")
 
         # Select features for the given classes
         feat_dense = feat_dense[one_hot]
         feat_dense = rearrange(feat_dense, "(b c) h w -> b c h w", b=cls_ids.size(0))
+
+        # Debugging shape after selection and rearrange
+        print(f"feat_dense shape after selection: {feat_dense.shape}")
+
         dense_embeddings = self.dense_fc_2(self.relu(self.dense_fc_1(feat_dense)))
 
         # Process for sparse embeddings
@@ -71,9 +81,9 @@ class Prototype_Prompt_Encoder(nn.Module):
 
         pos_embed = self.pn_cls_embeddings[1].weight.unsqueeze(0).unsqueeze(
             0
-        ) * one_hot.unsqueeze(-1).unsqueeze(-1)
+        ) * one_hot.view(cls_ids.size(0), -1, 1).unsqueeze(-1)
         neg_embed = self.pn_cls_embeddings[0].weight.unsqueeze(0).unsqueeze(0) * (
-            1 - one_hot
+            1 - one_hot.view(cls_ids.size(0), -1, 1)
         ).unsqueeze(-1).unsqueeze(-1)
 
         sparse_embeddings = sparse_embeddings + pos_embed.detach() + neg_embed.detach()
