@@ -56,21 +56,20 @@ class Prototype_Prompt_Encoder(nn.Module):
         print(f"one_hot shape: {one_hot.shape}")
 
         # Ensure that one_hot matches feat_dense shape for indexing
-        feat_dense = feat_dense.view(
-            feat_dense.size(0) * feat_dense.size(1), -1, feat_dense.size(-1)
-        )
-        one_hot = one_hot.view(feat_dense.size(0), -1).bool()
+        feat_dense = rearrange(feat_dense, "b n h w c -> (b n) h w c")
+        one_hot = rearrange(one_hot, "b n -> (b n)").bool()
 
         # Debugging shapes after reshaping
         print(f"feat_dense shape after reshape: {feat_dense.shape}")
         print(f"one_hot shape after reshape: {one_hot.shape}")
 
         # Select features for the given classes
-        feat_dense = feat_dense[one_hot].view(feat_dense.size(0) // 7, -1, 64, 64, 256)
+        feat_dense = feat_dense[one_hot].view(-1, 64, 64, 256)
 
         # Debugging shape after selection and rearrange
         print(f"feat_dense shape after selection: {feat_dense.shape}")
 
+        feat_dense = rearrange(feat_dense, "b h w c -> b c h w")
         dense_embeddings = self.dense_fc_2(self.relu(self.dense_fc_1(feat_dense)))
 
         # Process for sparse embeddings
