@@ -48,6 +48,7 @@ lr = 0.002  # 0.001
 num_workers = 2  # 4
 
 # for logger
+activate_logger = False
 w_project_name = "surgicalSAM - Endovis 2018 - SSAM-clip-full"
 c_loss_temp = 0.07
 
@@ -92,6 +93,7 @@ sam_decoder.cuda()
 print("======> Load CLIP Embeddings")
 clip_embeddings_handler = cl_em_dt.CLIPEmbeddings()
 fixed_prototypes = clip_embeddings_handler.get_embeddings()
+print("Number of CLIP embeddings:", fixed_prototypes.shape[0])
 
 # Setup the learnable prototypes and encoder with fixed prototypes ----------------
 print("======> Load Prototypes and Prototype-based Prompt Encoder")
@@ -172,22 +174,23 @@ print("======> Start Training and Validation")
 best_challenge_iou_val = -100.0
 
 # for logging
-print("======> Initialize wandb")
-wandb_logger.init(
-    project=w_project_name,
-    config={
-        "learning_rate": lr,
-        "architecture": "SSAM - Clip Full",
-        "dataset": dataset_name,
-        "epochs": num_epochs,
-        "temperature": c_loss_temp,
-        "batch_size": batch_size,
-        "fold": fold,
-        "learning_rate": lr,
-        "seed": seed,
-        "vit_mode": vit_mode,
-    },
-)
+if activate_logger:
+    print("======> Initialize wandb")
+    wandb_logger.init(
+        project=w_project_name,
+        config={
+            "learning_rate": lr,
+            "architecture": "SSAM - Clip Full",
+            "dataset": dataset_name,
+            "epochs": num_epochs,
+            "temperature": c_loss_temp,
+            "batch_size": batch_size,
+            "fold": fold,
+            "learning_rate": lr,
+            "seed": seed,
+            "vit_mode": vit_mode,
+        },
+    )
 
 
 # training and validation loop ----------------------------------------------------
@@ -291,7 +294,8 @@ for epoch in range(num_epochs):
         log_file,
     )
     # log results to wandb
-    wandb_logger.log_results(endovis_results)
+    if activate_logger:
+        wandb_logger.log_results(endovis_results)
 
     # save the model with the best challenge IoU
     if endovis_results["challengIoU"] > best_challenge_iou_val:
@@ -312,4 +316,5 @@ for epoch in range(num_epochs):
         )
 
 # close wandb
-wandb_logger.close()
+if activate_logger:
+    wandb_logger.close()
