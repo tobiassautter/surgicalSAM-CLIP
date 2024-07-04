@@ -59,30 +59,37 @@ class Prototype_Prompt_Encoder(nn.Module):
 
         # Ensuring that one_hot matches feat_dense shape for indexing
         feat_dense = rearrange(feat_dense, "b num_cls hw c -> b hw num_cls c")
-        one_hot = rearrange(one_hot, "b n -> b 1 n").bool()
+        one_hot = rearrange(one_hot, "b n -> b 1 n 1").bool()
 
         # Debugging shapes after reshaping
         print(
             f"feat_dense shape after reshape: {feat_dense.shape}"
         )  # [16, 4096, 16, 256]
-        print(f"one_hot shape after reshape: {one_hot.shape}")  # [16, 1, 7]
+        print(f"one_hot shape after reshape: {one_hot.shape}")  # [16, 1, 7, 1]
 
-        # Gather features based on class IDs
-        gathered_feat_dense = torch.gather(
-            feat_dense,
-            2,
-            one_hot.expand(-1, feat_dense.size(1), -1, feat_dense.size(3)).long(),
+        # Expand one_hot to match the dimensions of feat_dense
+        one_hot_expanded = one_hot.expand(
+            feat_dense.size(0), feat_dense.size(1), one_hot.size(2), feat_dense.size(3)
         )
 
-        # Debugging shape after gathering
+        # Debugging shape after expanding
         print(
-            f"gathered_feat_dense shape: {gathered_feat_dense.shape}"
+            f"one_hot_expanded shape: {one_hot_expanded.shape}"
         )  # Should match [16, 4096, 7, 256]
 
-        gathered_feat_dense = rearrange(gathered_feat_dense, "b hw n c -> (b n) c hw")
+        selected_feat_dense = feat_dense.masked_select(one_hot_expanded).view(
+            feat_dense.size(0), -1, feat_dense.size(1), feat_dense.size(3)
+        )
+
+        # Debugging shape after selection
+        print(
+            f"selected_feat_dense shape: {selected_feat_dense.shape}"
+        )  # Should match [16, 7, 4096, 256]
+
+        selected_feat_dense = rearrange(selected_feat_dense, "b n hw c -> (b n) c hw")
 
         dense_embeddings = self.dense_fc_2(
-            self.relu(self.dense_fc_1(gathered_feat_dense))
+            self.relu(self.dense_fc_1(selected_feat_dense))
         )
 
         # Process for sparse embeddings
