@@ -1,1 +1,0 @@
-{"Validation IoU": 0.0, "Validation Challenge IoU": 0.0, "mcIoU": 0.0, "mIoU": 0.0, "cIoU_class_0": 0.0, "cIoU_class_1": 0.0, "cIoU_class_2": 0.0, "cIoU_class_3": 0.0, "cIoU_class_4": 0.0, "cIoU_class_5": 0.0, "cIoU_class_6": 0.0, "_timestamp": 1719956741.604664, "_runtime": 13012.186633110046, "_step": 38, "_wandb": {"runtime": 13237}}

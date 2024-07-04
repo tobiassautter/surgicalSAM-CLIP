@@ -1,1 +1,0 @@
-{"Validation IoU": 47.283, "Validation Challenge IoU": 47.283, "mcIoU": 26.507, "mIoU": 43.823, "cIoU_class_0": 54.447, "cIoU_class_1": 22.765, "cIoU_class_2": 34.627, "cIoU_class_3": 55.424, "cIoU_class_4": 8.492, "cIoU_class_5": 4.834, "cIoU_class_6": 4.959, "_timestamp": 1720091779.5431218, "_runtime": 92112.99001789093, "_step": 288}
