@@ -70,15 +70,21 @@ class Prototype_Prompt_Encoder(nn.Module):
         # Verify content of one_hot tensor for debugging
         print(f"one_hot tensor content: {one_hot}")
 
+        # Expand one_hot to match feat_dense for masking
+        one_hot_expanded = one_hot.expand(
+            -1, feat_dense.size(1), -1, feat_dense.size(3)
+        )
+        print(f"one_hot_expanded shape: {one_hot_expanded.shape}")  # [16, 4096, 7, 256]
+
         # Select features for the given classes
         try:
-            selected_feat_dense = torch.masked_select(feat_dense, one_hot).view(
-                feat_dense.size(0), 64, 64, 256
-            )
+            selected_feat_dense = torch.masked_select(
+                feat_dense, one_hot_expanded
+            ).view(feat_dense.size(0), -1, 64, 64, 256)
         except RuntimeError as e:
             print(f"Error during masked_select: {e}")
             print(f"feat_dense shape during error: {feat_dense.shape}")
-            print(f"one_hot shape during error: {one_hot.shape}")
+            print(f"one_hot_expanded shape during error: {one_hot_expanded.shape}")
             raise e
 
         # Debugging shape after selection and rearrange
