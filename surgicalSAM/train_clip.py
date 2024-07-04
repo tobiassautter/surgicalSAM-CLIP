@@ -101,7 +101,7 @@ val_dataloader = DataLoader(
 )
 
 print("======> Load SAM")
-if vit_mode == "b":
+if vit_mode == "h":
     sam_checkpoint = "../ckp/sam/sam_vit_h_4b8939.pth"
 print("Checkpoint: ", sam_checkpoint)
 model_type = "vit_h_no_image_encoder"
