@@ -130,17 +130,17 @@ for name, param in sam_decoder.named_parameters():
 # load clip embeddings
 print("======> Load CLIP Embeddings")
 #clip_emb = clip_model_emb.get_emb(output_dim=256)
-
-clip_embeddings_handler = cl_em_dt.CLIPEmbeddings()
+feat_dim = 256
+clip_embeddings_handler = cl_em_dt.CLIPEmbeddings(output_dim=feat_dim)
 clip_emb = clip_embeddings_handler.get_embeddings().cuda()
 
 print("======> Load Prototypes and Prototype-based Prompt Encoder")
 learnable_prototypes_model = Learnable_Prototypes(
-    num_classes=7, feat_dim=256, clip_embeddings=clip_emb
+    num_classes=7, feat_dim=feat_dim, clip_embeddings=clip_emb
 ).cuda()
 
 protoype_prompt_encoder = Prototype_Prompt_Encoder(
-    feat_dim=256,
+    feat_dim=feat_dim,
     hidden_dim_dense=128,
     hidden_dim_sparse=128,
     size=64,
@@ -250,6 +250,7 @@ for epoch in range(num_epochs):
     #         version=version,
     #     )
     #print(train_dataset.__len__())
+
     train_dataloader = DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True#, num_workers=8
     )

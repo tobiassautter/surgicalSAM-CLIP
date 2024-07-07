@@ -20,7 +20,9 @@ class CLIPEmbeddings:
     def __init__(self, model_name="openai/clip-vit-base-patch32", output_dim=256):
         self.clip_model = CLIPModel.from_pretrained(model_name)
         self.clip_processor = CLIPProcessor.from_pretrained(model_name)
+        
         self.projection_layer = ProjectionLayer(input_dim=512, output_dim=output_dim)
+
         self.output_dim = output_dim
 
         self.instrument_details = [
@@ -43,8 +45,7 @@ class CLIPEmbeddings:
 
         # Normalize the embeddings
         text_features = torch.nn.functional.normalize(text_features, p=2, dim=-1)
+        # Project the embeddings to the desired dimension
+        text_features = self.projection_layer(text_features)
 
-        # Project CLIP embeddings to the desired dimension
-        projected_features = self.projection_layer(text_features)
-
-        return projected_features
+        return text_features
