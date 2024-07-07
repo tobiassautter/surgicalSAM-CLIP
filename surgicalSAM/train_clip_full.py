@@ -67,6 +67,12 @@ w_project_name = "surgicalSAM - Endovis 2018 - SSAM"
 c_loss_temp = 0.07
 log_data = False
 
+
+
+
+
+
+
 # set seed for reproducibility
 random.seed(seed)
 torch.manual_seed(seed)
@@ -74,6 +80,9 @@ torch.cuda.manual_seed(seed)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 np.random.seed(seed)
+
+
+
 
 print("======> Load Dataset-Specific Parameters")
 if "18" in dataset_name:
@@ -88,22 +97,13 @@ if "18" in dataset_name:
     save_dir = osp.join("..", "work_dirs", "endovis_2018")
     #"./work_dirs/endovis_2018/"
 
-# elif "17" in dataset_name:
-#    num_tokens = 4
-#    val_dataset = Endovis17Dataset(
-#        data_root_dir=data_root_dir, mode="val", fold=fold, vit_mode="h", version=0
-#    )
-#
-#    gt_endovis_masks = read_gt_endovis_masks(
-#        data_root_dir=data_root_dir, mode="val", fold=fold
-#    )
-#    num_epochs = 2000
-#    lr = 0.0001
-#    save_dir = f"./work_dirs/endovis_2017/{fold}"
+
 
 val_dataloader = DataLoader(
     val_dataset, batch_size=batch_size, shuffle=True # , num_workers=8
 )
+
+
 
 print("======> Load SAM")
 if vit_mode == "h":
@@ -122,16 +122,17 @@ sam_decoder.cuda()
 
 for name, param in sam_prompt_encoder.named_parameters():
     param.requires_grad = False
+
 for name, param in sam_decoder.named_parameters():
     param.requires_grad = True
 
 # load clip embeddings
-# print("======> Load CLIP Embeddings")
-# clip_emb = clip_model_emb.get_emb(output_dim=256)
+print("======> Load CLIP Embeddings")
+clip_emb = clip_model_emb.get_emb(output_dim=256)
 
 print("======> Load Prototypes and Prototype-based Prompt Encoder")
 learnable_prototypes_model = Learnable_Prototypes(
-    num_classes=7, feat_dim=256  # , clip_embeddings=clip_emb
+    num_classes=7, feat_dim=256, clip_embeddings=clip_emb
 ).cuda()
 
 protoype_prompt_encoder = Prototype_Prompt_Encoder(
