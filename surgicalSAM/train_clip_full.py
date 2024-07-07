@@ -2,7 +2,7 @@ import sys
 import os
 import os.path as osp
 
-sys.path.append(osp.join(osp.dirname(osp.abspath(__file__)), '..'))
+sys.path.append(osp.join(osp.dirname(osp.abspath(__file__)), ".."))
 import random
 import argparse
 import numpy as np
@@ -56,21 +56,16 @@ dataset_name = args.dataset
 fold = args.fold
 thr = 0
 seed = 123  # 666
-#data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
+# data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
 data_root_dir = osp.join("..", "data", dataset_name)
 print("Data Root Dir: ", data_root_dir)
 batch_size = 16  # 32  # 32
 vit_mode = "h"  # "h"
-use_agumentation = False
+use_agumentation = True
 # for logger
-w_project_name = "surgicalSAM - Endovis 2018 - SSAM"
+w_project_name = "surgicalSAM - Endovis 2018 - CLIP"
 c_loss_temp = 0.07
 log_data = False
-
-
-
-
-
 
 
 # set seed for reproducibility
@@ -80,8 +75,6 @@ torch.cuda.manual_seed(seed)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 np.random.seed(seed)
-
-
 
 
 print("======> Load Dataset-Specific Parameters")
@@ -95,19 +88,17 @@ if "18" in dataset_name:
     num_epochs = 100  # 500
     lr = 0.001  # 0.001
     save_dir = osp.join("..", "work_dirs", "endovis_2018")
-    #"./work_dirs/endovis_2018/"
-
+    # "./work_dirs/endovis_2018/"
 
 
 val_dataloader = DataLoader(
-    val_dataset, batch_size=batch_size, shuffle=True # , num_workers=8
+    val_dataset, batch_size=batch_size, shuffle=True, num_workers=4
 )
-
 
 
 print("======> Load SAM")
 if vit_mode == "h":
-    #sam_checkpoint = "../ckp/sam/sam_vit_h_4b8939.pth"
+    # sam_checkpoint = "../ckp/sam/sam_vit_h_4b8939.pth"
     sam_checkpoint = osp.join("..", "ckp", "sam", "sam_vit_h_4b8939.pth")
 print("Checkpoint: ", sam_checkpoint)
 model_type = "vit_h_no_image_encoder"
@@ -123,13 +114,13 @@ sam_decoder.cuda()
 for name, param in sam_prompt_encoder.named_parameters():
     param.requires_grad = False
 
-# only train decoder 
+# only train decoder
 for name, param in sam_decoder.named_parameters():
     param.requires_grad = True
 
 # load clip embeddings
 print("======> Load CLIP Embeddings")
-#clip_emb = clip_model_emb.get_emb(output_dim=256)
+# clip_emb = clip_model_emb.get_emb(output_dim=256)
 feat_dim = 256
 clip_embeddings_handler = cl_em_dt.CLIPEmbeddings(output_dim=feat_dim)
 clip_emb = clip_embeddings_handler.get_embeddings().cuda()
@@ -186,12 +177,12 @@ for name, param in protoype_prompt_encoder.named_parameters():
 
 print("======> Define Optmiser and Loss")
 seg_loss_model = DiceLoss().cuda()
-#contrastive_loss_model = losses.NTXentLoss(temperature=c_loss_temp).cuda()  # 0.07
+# contrastive_loss_model = losses.NTXentLoss(temperature=c_loss_temp).cuda()  # 0.07
 
 optimiser = torch.optim.Adam(
     [
-        #{"params": learnable_prototypes_model.parameters()},
-        #{"params": protoype_prompt_encoder.parameters()},
+        # {"params": learnable_prototypes_model.parameters()},
+        # {"params": protoype_prompt_encoder.parameters()},
         {"params": sam_decoder.parameters()},
     ],
     lr=lr,
@@ -249,10 +240,10 @@ for epoch in range(num_epochs):
     #         vit_mode=vit_mode,
     #         version=version,
     #     )
-    #print(train_dataset.__len__())
+    # print(train_dataset.__len__())
 
     train_dataloader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True#, num_workers=8
+        train_dataset, batch_size=batch_size, shuffle=True, num_workers=4
     )
 
     # training
@@ -287,7 +278,7 @@ for epoch in range(num_epochs):
         # )
         seg_loss = seg_loss_model(preds, masks / 255)
 
-        loss = seg_loss #+ contrastive_loss
+        loss = seg_loss  # + contrastive_loss
 
         optimiser.zero_grad()
         loss.backward()
@@ -295,9 +286,9 @@ for epoch in range(num_epochs):
 
     # validation
     binary_masks = dict()
-    protoype_prompt_encoder.eval()
+    # protoype_prompt_encoder.eval()
     sam_decoder.eval()
-    learnable_prototypes_model.eval()
+    # learnable_prototypes_model.eval()
 
     with torch.no_grad():
         prototypes = learnable_prototypes_model()
