@@ -66,9 +66,22 @@ class Prototype_Prompt_Encoder(nn.Module):
 
 
 class Learnable_Prototypes(nn.Module):
-    def __init__(self, num_classes=7 , feat_dim=256):
+    # def __init__(self, num_classes=7 , feat_dim=256):
+    #     super(Learnable_Prototypes, self).__init__()
+    #     self.class_embeddings = nn.Embedding(num_classes, feat_dim)
+    def __init__(self, num_classes=7, feat_dim=256, clip_embeddings=None):
         super(Learnable_Prototypes, self).__init__()
         self.class_embeddings = nn.Embedding(num_classes, feat_dim)
+        # initialize the class embeddings with the clip embeddings
+        if clip_embeddings is not None:
+            print("Initializing prototypes with CLIP embeddings.")
+            self.class_embeddings.weight.data.copy_(clip_embeddings)
+            print("Shape of CLIP embeddings: ", clip_embeddings.shape)
+            #print the first 5 class embeddings
+            # print(self.class_embeddings.weight.data[:5])
+            self.class_embeddings.weight.requires_grad = (
+                False  # Ensuring they are not trainable
+            )
         
     def forward(self):
         return self.class_embeddings.weight

@@ -31,7 +31,7 @@ from torch.optim.lr_scheduler import LinearLR
 import wandb_logger
 
 ## import clip_model_emb.py
-import tools.clip_model_emb as clip_model_emb
+import tools.clip_model_emb as cl_em_dt
 
 print("======> Process Arguments")
 parser = argparse.ArgumentParser()
@@ -93,7 +93,7 @@ if "18" in dataset_name:
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
     num_epochs = 100  # 500
-    lr = 0.002  # 0.001
+    lr = 0.001  # 0.001
     save_dir = osp.join("..", "work_dirs", "endovis_2018")
     #"./work_dirs/endovis_2018/"
 
@@ -128,7 +128,10 @@ for name, param in sam_decoder.named_parameters():
 
 # load clip embeddings
 print("======> Load CLIP Embeddings")
-clip_emb = clip_model_emb.get_emb(output_dim=256)
+#clip_emb = clip_model_emb.get_emb(output_dim=256)
+
+clip_embeddings_handler = cl_em_dt.CLIPEmbeddings()
+clip_emb = clip_embeddings_handler.get_embeddings().cuda()
 
 print("======> Load Prototypes and Prototype-based Prompt Encoder")
 learnable_prototypes_model = Learnable_Prototypes(
