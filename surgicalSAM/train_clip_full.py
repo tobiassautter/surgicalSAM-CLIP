@@ -186,23 +186,18 @@ for name, param in protoype_prompt_encoder.named_parameters():
 
 print("======> Define Optmiser and Loss")
 seg_loss_model = DiceLoss().cuda()
-contrastive_loss_model = losses.NTXentLoss(temperature=c_loss_temp).cuda()  # 0.07
+#contrastive_loss_model = losses.NTXentLoss(temperature=c_loss_temp).cuda()  # 0.07
 
 optimiser = torch.optim.Adam(
     [
-        {"params": learnable_prototypes_model.parameters()},
-        {"params": protoype_prompt_encoder.parameters()},
+        #{"params": learnable_prototypes_model.parameters()},
+        #{"params": protoype_prompt_encoder.parameters()},
         {"params": sam_decoder.parameters()},
     ],
     lr=lr,
     weight_decay=0.0001,  # 0.0001,
 )
 
-# Define the scheduler
-# scheduler = ExponentialLR(optimiser, gamma=0.95)  # Adjust gamma to your needs
-# scheduler = LinearLR(
-#     optimizer=optimiser, start_factor=1, end_factor=0.02, total_iters=200
-# )
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
@@ -254,15 +249,15 @@ for epoch in range(num_epochs):
     #         vit_mode=vit_mode,
     #         version=version,
     #     )
-    print(train_dataset.__len__())
+    #print(train_dataset.__len__())
     train_dataloader = DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True#, num_workers=8
     )
 
     # training
-    protoype_prompt_encoder.train()
+    # protoype_prompt_encoder.train()
     sam_decoder.train()
-    learnable_prototypes_model.train()
+    # learnable_prototypes_model.train()
 
     for sam_feats, _, cls_ids, masks, class_embeddings in train_dataloader:
 
@@ -283,15 +278,15 @@ for epoch in range(num_epochs):
         )
 
         # compute loss
-        contrastive_loss = contrastive_loss_model(
-            prototypes,
-            torch.tensor([i for i in range(1, prototypes.size()[0] + 1)]).cuda(),
-            ref_emb=class_embeddings,
-            ref_labels=cls_ids,
-        )
+        # contrastive_loss = contrastive_loss_model(
+        #     prototypes,
+        #     torch.tensor([i for i in range(1, prototypes.size()[0] + 1)]).cuda(),
+        #     ref_emb=class_embeddings,
+        #     ref_labels=cls_ids,
+        # )
         seg_loss = seg_loss_model(preds, masks / 255)
 
-        loss = seg_loss + contrastive_loss
+        loss = seg_loss #+ contrastive_loss
 
         optimiser.zero_grad()
         loss.backward()
@@ -326,10 +321,6 @@ for epoch in range(num_epochs):
 
     endovis_masks = create_endovis_masks(binary_masks, 1024, 1280)
     endovis_results = eval_endovis(endovis_masks, gt_endovis_masks)
-
-    # scheduler step after val
-    # print(f"Updated learning rate: {scheduler.get_last_lr()}")
-    # scheduler.step()
 
     # print validation results in log
     print_log(
