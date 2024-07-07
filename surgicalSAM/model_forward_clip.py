@@ -1,48 +1,60 @@
-import torch 
+import torch
 from einops import rearrange
 from torch.nn import functional as F
 
-# forward process of the model
-def model_forward_function(prototype_prompt_encoder, 
-                            sam_prompt_encoder, 
-                            sam_decoder, 
-                            sam_feats, 
-                            prototypes, 
-                            cls_ids): 
-        
-    sam_feats = rearrange(sam_feats, 'b h w c -> b (h w) c')
 
-    
-    dense_embeddings, sparse_embeddings = prototype_prompt_encoder(sam_feats, prototypes, cls_ids)
+# forward process of the model
+def model_forward_function(
+    prototype_prompt_encoder,
+    sam_prompt_encoder,
+    sam_decoder,
+    sam_feats,
+    prototypes,
+    cls_ids,
+):
+
+    sam_feats = rearrange(sam_feats, "b h w c -> b (h w) c")
+    # debugging print statements shapes of the inputs
+    print(f"sam_feats shape: {sam_feats.shape}")
+    print(f"prototypes shape: {prototypes.shape}")
+    print(f"cls_ids: {cls_ids}")
+
+    dense_embeddings, sparse_embeddings = prototype_prompt_encoder(
+        sam_feats, prototypes, cls_ids
+    )
+    # debugging print statements embedded in the model
+    print(f"dense_embeddings shape: {dense_embeddings.shape}")
+    print(f"sparse_embeddings shape: {sparse_embeddings.shape}")
 
     pred = []
     pred_quality = []
-    sam_feats = rearrange(sam_feats,'b (h w) c -> b c h w', h=64, w=64)
- 
-    for dense_embedding, sparse_embedding, features_per_image in zip(dense_embeddings.unsqueeze(1), sparse_embeddings.unsqueeze(1), sam_feats):    
-        
+    sam_feats = rearrange(sam_feats, "b (h w) c -> b c h w", h=64, w=64)
+
+    for dense_embedding, sparse_embedding, features_per_image in zip(
+        dense_embeddings.unsqueeze(1), sparse_embeddings.unsqueeze(1), sam_feats
+    ):
+
         low_res_masks_per_image, mask_quality_per_image = sam_decoder(
-                image_embeddings=features_per_image.unsqueeze(0),
-                image_pe=sam_prompt_encoder.get_dense_pe(), 
-                sparse_prompt_embeddings=sparse_embedding,
-                dense_prompt_embeddings=dense_embedding, 
-                multimask_output=False,
-            )
+            image_embeddings=features_per_image.unsqueeze(0),
+            image_pe=sam_prompt_encoder.get_dense_pe(),
+            sparse_prompt_embeddings=sparse_embedding,
+            dense_prompt_embeddings=dense_embedding,
+            multimask_output=False,
+        )
 
         pred_per_image = postprocess_masks(
             low_res_masks_per_image,
             input_size=(819, 1024),
             original_size=(1024, 1280),
         )
-        
+
         pred.append(pred_per_image)
         pred_quality.append(mask_quality_per_image)
-        
-    pred = torch.cat(pred,dim=0).squeeze(1)
-    pred_quality = torch.cat(pred_quality,dim=0).squeeze(1)
-    
-    return pred, pred_quality
 
+    pred = torch.cat(pred, dim=0).squeeze(1)
+    pred_quality = torch.cat(pred_quality, dim=0).squeeze(1)
+
+    return pred, pred_quality
 
 
 # taken from sam.postprocess_masks of https://github.com/facebookresearch/segment-anything

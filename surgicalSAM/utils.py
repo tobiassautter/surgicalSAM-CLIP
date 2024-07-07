@@ -3,9 +3,10 @@ import cv2
 import torch 
 import os 
 import os.path as osp 
-import re 
+import re
+# find system path characters
 
-
+sep = str(os.sep)
 
 def create_binary_masks(binary_masks, preds, preds_quality, mask_names, thr):
 
@@ -21,8 +22,9 @@ def create_binary_masks(binary_masks, preds, preds_quality, mask_names, thr):
     
 
     for pred_mask, mask_name, pred_quality in zip(pred_masks, mask_names, preds_quality):        
-      
-        seq_name = mask_name.split("/")[0]
+        
+
+        seq_name = mask_name.split(sep)[0]
         frame_name = osp.basename(mask_name).split("_")[0]
         
         if seq_name not in binary_masks.keys():
@@ -71,7 +73,9 @@ def create_endovis_masks(binary_masks, H, W):
 
             endovis_mask = endovis_mask.astype(int)
 
-            endovis_masks[f"{seq}/{frame}.png"] = endovis_mask
+            # set with osp path
+            seq_path = osp.join(seq, "{}.png".format(frame))
+            endovis_masks[seq_path] = endovis_mask
     
     return endovis_masks
 
@@ -186,7 +190,7 @@ def read_gt_endovis_masks(data_root_dir = "../data/endovis_2018",
         gt_endovis_masks_path = osp.join(data_root_dir, mode, "annotations")
         for seq in os.listdir(gt_endovis_masks_path):
             for mask_name in os.listdir(osp.join(gt_endovis_masks_path, seq)):
-                full_mask_name = f"{seq}/{mask_name}"
+                full_mask_name = osp.join(seq, mask_name) #f"{seq}/{mask_name}"
                 mask = torch.from_numpy(cv2.imread(osp.join(gt_endovis_masks_path, full_mask_name),cv2.IMREAD_GRAYSCALE))
                 gt_endovis_masks[full_mask_name] = mask
                 
@@ -206,7 +210,7 @@ def read_gt_endovis_masks(data_root_dir = "../data/endovis_2018",
         
         for seq in seqs:
             for mask_name in os.listdir(osp.join(gt_endovis_masks_path, f"seq{seq}")):
-                full_mask_name = f"seq{seq}/{mask_name}"
+                full_mask_name = osp(seq, mask_name) #f"{seq}/{mask_name}"
                 mask = torch.from_numpy(cv2.imread(osp.join(gt_endovis_masks_path, full_mask_name),cv2.IMREAD_GRAYSCALE))
                 gt_endovis_masks[full_mask_name] = mask
             

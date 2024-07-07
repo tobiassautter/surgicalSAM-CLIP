@@ -1,9 +1,8 @@
 import sys
-
 import os
 import os.path as osp
-sys.path.append(osp.join(osp.dirname(osp.abspath(__file__)), '..'))
 
+sys.path.append(osp.join(osp.dirname(osp.abspath(__file__)), '..'))
 import random
 import argparse
 import numpy as np
@@ -11,7 +10,7 @@ import torch
 from torch.utils.data import DataLoader
 from dataset import Endovis18Dataset, Endovis17Dataset
 from segment_anything import sam_model_registry
-from model_clip import Learnable_Prototypes, Prototype_Prompt_Encoder
+from model import Learnable_Prototypes, Prototype_Prompt_Encoder
 from utils import (
     print_log,
     create_binary_masks,
@@ -25,36 +24,50 @@ from pytorch_metric_learning import losses
 from datetime import datetime
 
 # Exponantial LR
-# from torch.optim.lr_scheduler import ExponentialLR
-# from torch.optim.lr_scheduler import LinearLR
+from torch.optim.lr_scheduler import ExponentialLR
+from torch.optim.lr_scheduler import LinearLR
 
 ## logger
 import wandb_logger
 
 ## import clip_model_emb.py
-import tools.clip_model_emb as cl_em_dt
+import tools.clip_model_emb as clip_model_emb
 
+print("======> Process Arguments")
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--dataset",
+    type=str,
+    default="endovis_2018",
+    choices=["endovis_2018", "endovis_2017"],
+    help="specify dataset",
+)
+parser.add_argument(
+    "--fold",
+    type=int,
+    default=0,
+    choices=[0, 1, 2, 3],
+    help="specify fold number for endovis_2017 dataset",
+)
+args = parser.parse_args()
 
 print("======> Set Parameters for Training")
-dataset_name = "endovis_2018"
-fold = 0
+dataset_name = args.dataset
+fold = args.fold
 thr = 0
-# project def
 seed = 123  # 666
 #data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
 data_root_dir = osp.join("..", "data", dataset_name)
+print("Data Root Dir: ", data_root_dir)
 batch_size = 16  # 32  # 32
 vit_mode = "h"  # "h"
-num_epochs = 100  # 500
-lr = 0.002  # 0.001
-num_workers = 2  # 4
-
+use_agumentation = False
 # for logger
-activate_logger = False
-w_project_name = "surgicalSAM - Endovis 2018 - SSAM-clip-full"
+w_project_name = "surgicalSAM - Endovis 2018 - SSAM"
 c_loss_temp = 0.07
+log_data = False
 
-# set seed for reproducibility -----------------------------------------------------
+# set seed for reproducibility
 random.seed(seed)
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
@@ -62,25 +75,40 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 np.random.seed(seed)
 
-# load dataset-specific parameters ------------------------------------------------
 print("======> Load Dataset-Specific Parameters")
+if "18" in dataset_name:
+    num_tokens = 2
+    val_dataset = Endovis18Dataset(
+        data_root_dir=data_root_dir, mode="val", vit_mode="h"
+    )
 
-num_tokens = 2
-val_dataset = Endovis18Dataset(
-    data_root_dir=data_root_dir, mode="val", vit_mode=vit_mode
-)
+    gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
+    num_epochs = 100  # 500
+    lr = 0.002  # 0.001
+    save_dir = osp.join("..", "work_dirs", "endovis_2018")
+    #"./work_dirs/endovis_2018/"
 
-gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
-save_dir = osp.join("..", "work_dirs", "endovis_2018")
-
+# elif "17" in dataset_name:
+#    num_tokens = 4
+#    val_dataset = Endovis17Dataset(
+#        data_root_dir=data_root_dir, mode="val", fold=fold, vit_mode="h", version=0
+#    )
+#
+#    gt_endovis_masks = read_gt_endovis_masks(
+#        data_root_dir=data_root_dir, mode="val", fold=fold
+#    )
+#    num_epochs = 2000
+#    lr = 0.0001
+#    save_dir = f"./work_dirs/endovis_2017/{fold}"
 
 val_dataloader = DataLoader(
-    val_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers
+    val_dataset, batch_size=batch_size, shuffle=True # , num_workers=8
 )
-# load sam model -------------------------------------------------------------------
-print("======> Load SAM")
-sam_checkpoint = osp.join("..", "ckp", "sam", "sam_vit_h_4b8939.pth")
 
+print("======> Load SAM")
+if vit_mode == "h":
+    #sam_checkpoint = "../ckp/sam/sam_vit_h_4b8939.pth"
+    sam_checkpoint = osp.join("..", "ckp", "sam", "sam_vit_h_4b8939.pth")
 print("Checkpoint: ", sam_checkpoint)
 model_type = "vit_h_no_image_encoder"
 
@@ -88,21 +116,22 @@ sam_prompt_encoder, sam_decoder = sam_model_registry[model_type](
     checkpoint=sam_checkpoint
 )
 
+
 sam_prompt_encoder.cuda()
 sam_decoder.cuda()
 
-# Load CLIP Embeddings
-print("======> Load CLIP Embeddings")
-clip_embeddings_handler = cl_em_dt.CLIPEmbeddings()
-fixed_prototypes = clip_embeddings_handler.get_embeddings().cuda()
-print("Number of CLIP embeddings:", fixed_prototypes.shape[0])
+for name, param in sam_prompt_encoder.named_parameters():
+    param.requires_grad = False
+for name, param in sam_decoder.named_parameters():
+    param.requires_grad = True
 
-# Setup the learnable prototypes and encoder with fixed prototypes
+# load clip embeddings
+# print("======> Load CLIP Embeddings")
+# clip_emb = clip_model_emb.get_emb(output_dim=256)
+
 print("======> Load Prototypes and Prototype-based Prompt Encoder")
 learnable_prototypes_model = Learnable_Prototypes(
-    num_classes=fixed_prototypes.shape[0],
-    feat_dim=fixed_prototypes.shape[1],
-    clip_embeddings=fixed_prototypes,
+    num_classes=7, feat_dim=256  # , clip_embeddings=clip_emb
 ).cuda()
 
 protoype_prompt_encoder = Prototype_Prompt_Encoder(
@@ -113,128 +142,123 @@ protoype_prompt_encoder = Prototype_Prompt_Encoder(
     num_tokens=num_tokens,
 ).cuda()
 
-# Ensure all parameters except the decoder are not trainable -----------------------
-print("======> Set Parameters to be Trained")
-for param in learnable_prototypes_model.parameters():
-    param.requires_grad = False
-for param in protoype_prompt_encoder.parameters():
-    param.requires_grad = False
-for param in sam_decoder.parameters():
-    param.requires_grad = True
-
-
-#
-# with open(sam_checkpoint, "rb") as f:
-#     state_dict = torch.load(f)
-#     sam_pn_embeddings_weight = {
-#         k.split("prompt_encoder.point_embeddings.")[-1]: v
-#         for k, v in state_dict.items()
-#         if k.startswith("prompt_encoder.point_embeddings") and ("0" in k or "1" in k)
-#     }
-#     sam_pn_embeddings_weight_ckp = {
-#         "0.weight": torch.concat(
-#             [sam_pn_embeddings_weight["0.weight"] for _ in range(num_tokens)], dim=0
-#         ),
-#         "1.weight": torch.concat(
-#             [sam_pn_embeddings_weight["1.weight"] for _ in range(num_tokens)], dim=0
-#         ),
-#     }
-
-#     protoype_prompt_encoder.pn_cls_embeddings.load_state_dict(
-#         sam_pn_embeddings_weight_ckp
-#     )
-
-# Load the state dictionary only if needed
 with open(sam_checkpoint, "rb") as f:
     state_dict = torch.load(f)
-    # Filter only needed parts if necessary, assuming you need to load something specific
-    prototype_related_state_dict = {
-        k: v for k, v in state_dict.items() if "prototype" in k
+    sam_pn_embeddings_weight = {
+        k.split("prompt_encoder.point_embeddings.")[-1]: v
+        for k, v in state_dict.items()
+        if k.startswith("prompt_encoder.point_embeddings") and ("0" in k or "1" in k)
     }
-    protoype_prompt_encoder.load_state_dict(prototype_related_state_dict, strict=False)
+    sam_pn_embeddings_weight_ckp = {
+        "0.weight": torch.concat(
+            [sam_pn_embeddings_weight["0.weight"] for _ in range(num_tokens)], dim=0
+        ),
+        "1.weight": torch.concat(
+            [sam_pn_embeddings_weight["1.weight"] for _ in range(num_tokens)], dim=0
+        ),
+    }
 
+    protoype_prompt_encoder.pn_cls_embeddings.load_state_dict(
+        sam_pn_embeddings_weight_ckp
+    )
 
-# optimiser and loss --------------------------------------------------------------
+for name, param in learnable_prototypes_model.named_parameters():
+    param.requires_grad = True
+
+for name, param in protoype_prompt_encoder.named_parameters():
+    if "pn_cls_embeddings" in name:
+        param.requires_grad = False
+    else:
+        param.requires_grad = True
+
 print("======> Define Optmiser and Loss")
-# Adjusting the optimizer to only update the decoder parameters
-optimizer = torch.optim.Adam(
-    sam_decoder.parameters(),
+seg_loss_model = DiceLoss().cuda()
+contrastive_loss_model = losses.NTXentLoss(temperature=c_loss_temp).cuda()  # 0.07
+
+optimiser = torch.optim.Adam(
+    [
+        {"params": learnable_prototypes_model.parameters()},
+        {"params": protoype_prompt_encoder.parameters()},
+        {"params": sam_decoder.parameters()},
+    ],
     lr=lr,
-    weight_decay=0.0001,
+    weight_decay=0.0001,  # 0.0001,
 )
 
-# Continue using the same loss functions as before
-seg_loss_model = DiceLoss().cuda()
-contrastive_loss_model = losses.NTXentLoss(temperature=c_loss_temp).cuda()
-
-
-# make dirs and logs -------------------------------------------------------------
+# Define the scheduler
+# scheduler = ExponentialLR(optimiser, gamma=0.95)  # Adjust gamma to your needs
+# scheduler = LinearLR(
+#     optimizer=optimiser, start_factor=1, end_factor=0.02, total_iters=200
+# )
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
-log_file = osp.join(save_dir, "log_clip_SS_full.txt")
-print_log(dataset_name, log_file)
+log_file = osp.join(save_dir, "log_clip_SS.txt")
+print_log(str(args), log_file)
 
 print("======> Start Training and Validation")
 best_challenge_iou_val = -100.0
 
 # for logging
-if activate_logger:
+if log_data:
     print("======> Initialize wandb")
     wandb_logger.init(
         project=w_project_name,
         config={
             "learning_rate": lr,
-            "architecture": "SSAM - Clip Full",
+            "architecture": "SSAM - orig",
             "dataset": dataset_name,
             "epochs": num_epochs,
             "temperature": c_loss_temp,
             "batch_size": batch_size,
-            "fold": fold,
-            "learning_rate": lr,
-            "seed": seed,
-            "vit_mode": vit_mode,
         },
     )
 
-
-# training and validation loop ----------------------------------------------------
 for epoch in range(num_epochs):
-    # if epoch % 2 == 0:
-    #     version = 0
-    # else:
-    #     version = int((epoch % 80 + 1) / 2)
-    version = 0
 
-    train_dataset = Endovis18Dataset(
-        data_root_dir=data_root_dir,
-        mode="train",
-        vit_mode=vit_mode,
-        version=version,
-    )
-    train_dataloader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True#, num_workers=num_workers
-    )
+    # choose the augmentation version to use for the current epoch
+    if use_agumentation:
+        if epoch % 2 == 0:
+            version = 0
+        else:
+            version = int((epoch % 80 + 1) / 2)
+    else:
+        version = 0
 
-    sam_decoder.train()
-    for sam_feats, _, cls_ids, masks, class_embeddings in train_dataloader:
-        sam_feats, cls_ids, masks, class_embeddings = (
-            sam_feats.cuda(),
-            cls_ids.cuda(),
-            masks.cuda(),
-            class_embeddings.cuda(),
+    if "18" in dataset_name:
+        train_dataset = Endovis18Dataset(
+            data_root_dir=data_root_dir,
+            mode="train",
+            vit_mode=vit_mode,
+            version=version,
         )
 
-        # Ensuring the use of correct prototypes for each class ID
-        prototypes = fixed_prototypes[cls_ids]
-        print(f"Prototypes selected for current batch: {prototypes.shape}")
+    # elif "17" in dataset_name:
+    #     train_dataset = Endovis17Dataset(
+    #         data_root_dir=data_root_dir,
+    #         mode="train",
+    #         fold=fold,
+    #         vit_mode=vit_mode,
+    #         version=version,
+    #     )
+    print(train_dataset.__len__())
+    train_dataloader = DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True#, num_workers=8
+    )
 
-        # Print cls_ids to verify correct batch data
-        print("Current batch cls_ids:", cls_ids)
-        print("Prototypes selected for current batch:", prototypes.shape)
-        print("sam_feats shape:", sam_feats.shape)
-        print("prototypes shape:", prototypes.shape)
-        print("cls_ids:", cls_ids)
+    # training
+    protoype_prompt_encoder.train()
+    sam_decoder.train()
+    learnable_prototypes_model.train()
+
+    for sam_feats, _, cls_ids, masks, class_embeddings in train_dataloader:
+
+        sam_feats = sam_feats.cuda()
+        cls_ids = cls_ids.cuda()
+        masks = masks.cuda()
+        class_embeddings = class_embeddings.cuda()
+
+        prototypes = learnable_prototypes_model()
 
         preds, _ = model_forward_function(
             protoype_prompt_encoder,
@@ -245,38 +269,34 @@ for epoch in range(num_epochs):
             cls_ids,
         )
 
-        # Output dimensions of predictions for sanity check
-        print(f"Predictions shape: {preds.shape}")
-
-        seg_loss = seg_loss_model(preds, masks / 255)
+        # compute loss
         contrastive_loss = contrastive_loss_model(
             prototypes,
-            torch.arange(prototypes.size(0)).cuda(),
+            torch.tensor([i for i in range(1, prototypes.size()[0] + 1)]).cuda(),
             ref_emb=class_embeddings,
             ref_labels=cls_ids,
         )
-        # Total loss is the sum of segmentation and contrastive loss ----------------------------
-        loss = seg_loss + contrastive_loss
-        print(
-            f"Segmentation Loss: {seg_loss.item()}, Contrastive Loss: {contrastive_loss.item()}"
-        )
+        seg_loss = seg_loss_model(preds, masks / 255)
 
-        optimizer.zero_grad()
+        loss = seg_loss + contrastive_loss
+
+        optimiser.zero_grad()
         loss.backward()
-        optimizer.step()
+        optimiser.step()
 
     # validation
     binary_masks = dict()
     protoype_prompt_encoder.eval()
     sam_decoder.eval()
-    # learnable_prototypes_model.eval()
+    learnable_prototypes_model.eval()
 
     with torch.no_grad():
-        # During validation (if using the same logic as training)
+        prototypes = learnable_prototypes_model()
+
         for sam_feats, mask_names, cls_ids, _, _ in val_dataloader:
-            sam_feats, cls_ids = sam_feats.cuda(), cls_ids.cuda()
-            # Using fixed prototypes based on class IDs
-            prototypes = fixed_prototypes[cls_ids]
+
+            sam_feats = sam_feats.cuda()
+            cls_ids = cls_ids.cuda()
 
             preds, preds_quality = model_forward_function(
                 protoype_prompt_encoder,
@@ -294,6 +314,10 @@ for epoch in range(num_epochs):
     endovis_masks = create_endovis_masks(binary_masks, 1024, 1280)
     endovis_results = eval_endovis(endovis_masks, gt_endovis_masks)
 
+    # scheduler step after val
+    # print(f"Updated learning rate: {scheduler.get_last_lr()}")
+    # scheduler.step()
+
     # print validation results in log
     print_log(
         f"Validation - Epoch: {epoch}/{num_epochs-1}; IoU_Results: {endovis_results} ",
@@ -305,7 +329,7 @@ for epoch in range(num_epochs):
         log_file,
     )
     # log results to wandb
-    if activate_logger:
+    if log_data:
         wandb_logger.log_results(endovis_results)
 
     # save the model with the best challenge IoU
@@ -318,7 +342,7 @@ for epoch in range(num_epochs):
                 "sam_decoder_state_dict": sam_decoder.state_dict(),
                 "prototypes_state_dict": learnable_prototypes_model.state_dict(),
             },
-            osp.join(save_dir, "model_ckp_SSAM_clip.pth"),
+            osp.join(save_dir, "model_ckp_SSAM.pth"),
         )
 
         print_log(
@@ -327,5 +351,5 @@ for epoch in range(num_epochs):
         )
 
 # close wandb
-if activate_logger:
+if log_data:
     wandb_logger.close()
