@@ -123,6 +123,7 @@ sam_decoder.cuda()
 for name, param in sam_prompt_encoder.named_parameters():
     param.requires_grad = False
 
+# only train decoder 
 for name, param in sam_decoder.named_parameters():
     param.requires_grad = True
 
@@ -145,6 +146,14 @@ protoype_prompt_encoder = Prototype_Prompt_Encoder(
     size=64,
     num_tokens=num_tokens,
 ).cuda()
+
+# freeze the prototype encoder
+for name, param in learnable_prototypes_model.named_parameters():
+    param.requires_grad = False
+# freeze the prompt encoder
+for name, param in protoype_prompt_encoder.named_parameters():
+    param.requires_grad = False
+
 
 with open(sam_checkpoint, "rb") as f:
     state_dict = torch.load(f)
