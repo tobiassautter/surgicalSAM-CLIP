@@ -1,8 +1,9 @@
 import sys
 
-sys.path.append("..")
 import os
 import os.path as osp
+sys.path.append(osp.join(osp.dirname(osp.abspath(__file__)), '..'))
+
 import random
 import argparse
 import numpy as np
@@ -31,7 +32,7 @@ from datetime import datetime
 import wandb_logger
 
 ## import clip_model_emb.py
-import tools.cl_emb_detailed as cl_em_dt
+import tools.clip_model_emb as cl_em_dt
 
 
 print("======> Set Parameters for Training")
@@ -40,7 +41,8 @@ fold = 0
 thr = 0
 # project def
 seed = 123  # 666
-data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
+#data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
+data_root_dir = osp.join("..", "data", dataset_name)
 batch_size = 16  # 32  # 32
 vit_mode = "h"  # "h"
 num_epochs = 100  # 500
@@ -69,7 +71,7 @@ val_dataset = Endovis18Dataset(
 )
 
 gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
-save_dir = "./work_dirs/endovis_2018/"
+save_dir = osp.join("..", "work_dirs", "endovis_2018")
 
 
 val_dataloader = DataLoader(
@@ -77,7 +79,7 @@ val_dataloader = DataLoader(
 )
 # load sam model -------------------------------------------------------------------
 print("======> Load SAM")
-sam_checkpoint = "../ckp/sam/sam_vit_h_4b8939.pth"
+sam_checkpoint = osp.join("..", "ckp", "sam", "sam_vit_h_4b8939.pth")
 
 print("Checkpoint: ", sam_checkpoint)
 model_type = "vit_h_no_image_encoder"
@@ -92,7 +94,7 @@ sam_decoder.cuda()
 # Load CLIP Embeddings
 print("======> Load CLIP Embeddings")
 clip_embeddings_handler = cl_em_dt.CLIPEmbeddings()
-fixed_prototypes = clip_embeddings_handler.get_embeddings()
+fixed_prototypes = clip_embeddings_handler.get_embeddings().cuda()
 print("Number of CLIP embeddings:", fixed_prototypes.shape[0])
 
 # Setup the learnable prototypes and encoder with fixed prototypes
@@ -198,10 +200,11 @@ if activate_logger:
 
 # training and validation loop ----------------------------------------------------
 for epoch in range(num_epochs):
-    if epoch % 2 == 0:
-        version = 0
-    else:
-        version = int((epoch % 80 + 1) / 2)
+    # if epoch % 2 == 0:
+    #     version = 0
+    # else:
+    #     version = int((epoch % 80 + 1) / 2)
+    version = 0
 
     train_dataset = Endovis18Dataset(
         data_root_dir=data_root_dir,
@@ -210,7 +213,7 @@ for epoch in range(num_epochs):
         version=version,
     )
     train_dataloader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers
+        train_dataset, batch_size=batch_size, shuffle=True#, num_workers=num_workers
     )
 
     sam_decoder.train()

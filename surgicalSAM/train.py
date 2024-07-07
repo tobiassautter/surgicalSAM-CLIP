@@ -1,8 +1,8 @@
 import sys
-
-sys.path.append("..")
 import os
 import os.path as osp
+
+sys.path.append(osp.join(osp.dirname(osp.abspath(__file__)), '..'))
 import random
 import argparse
 import numpy as np
@@ -56,12 +56,16 @@ dataset_name = args.dataset
 fold = args.fold
 thr = 0
 seed = 123  # 666
-data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
+#data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
+data_root_dir = osp.join("..", "data", dataset_name)
+print("Data Root Dir: ", data_root_dir)
 batch_size = 16  # 32  # 32
 vit_mode = "h"  # "h"
+use_agumentation = False
 # for logger
 w_project_name = "surgicalSAM - Endovis 2018 - SSAM"
 c_loss_temp = 0.07
+log_data = False
 
 # set seed for reproducibility
 random.seed(seed)
@@ -81,7 +85,8 @@ if "18" in dataset_name:
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
     num_epochs = 100  # 500
     lr = 0.002  # 0.001
-    save_dir = "./work_dirs/endovis_2018/"
+    save_dir = osp.join("..", "work_dirs", "endovis_2018")
+    #"./work_dirs/endovis_2018/"
 
 # elif "17" in dataset_name:
 #    num_tokens = 4
@@ -97,12 +102,13 @@ if "18" in dataset_name:
 #    save_dir = f"./work_dirs/endovis_2017/{fold}"
 
 val_dataloader = DataLoader(
-    val_dataset, batch_size=batch_size, shuffle=True, num_workers=2
+    val_dataset, batch_size=batch_size, shuffle=True, num_workers=8
 )
 
 print("======> Load SAM")
 if vit_mode == "h":
-    sam_checkpoint = "../ckp/sam/sam_vit_h_4b8939.pth"
+    #sam_checkpoint = "../ckp/sam/sam_vit_h_4b8939.pth"
+    sam_checkpoint = osp.join("..", "ckp", "sam", "sam_vit_h_4b8939.pth")
 print("Checkpoint: ", sam_checkpoint)
 model_type = "vit_h_no_image_encoder"
 
@@ -205,26 +211,30 @@ print("======> Start Training and Validation")
 best_challenge_iou_val = -100.0
 
 # for logging
-print("======> Initialize wandb")
-wandb_logger.init(
-    project=w_project_name,
-    config={
-        "learning_rate": lr,
-        "architecture": "SSAM - orig",
-        "dataset": dataset_name,
-        "epochs": num_epochs,
-        "temperature": c_loss_temp,
-        "batch_size": batch_size,
-    },
-)
+if log_data:
+    print("======> Initialize wandb")
+    wandb_logger.init(
+        project=w_project_name,
+        config={
+            "learning_rate": lr,
+            "architecture": "SSAM - orig",
+            "dataset": dataset_name,
+            "epochs": num_epochs,
+            "temperature": c_loss_temp,
+            "batch_size": batch_size,
+        },
+    )
 
 for epoch in range(num_epochs):
 
     # choose the augmentation version to use for the current epoch
-    if epoch % 2 == 0:
-        version = 0
+    if use_agumentation:
+        if epoch % 2 == 0:
+            version = 0
+        else:
+            version = int((epoch % 80 + 1) / 2)
     else:
-        version = int((epoch % 80 + 1) / 2)
+        version = 0
 
     if "18" in dataset_name:
         train_dataset = Endovis18Dataset(
@@ -234,17 +244,17 @@ for epoch in range(num_epochs):
             version=version,
         )
 
-    elif "17" in dataset_name:
-        train_dataset = Endovis17Dataset(
-            data_root_dir=data_root_dir,
-            mode="train",
-            fold=fold,
-            vit_mode=vit_mode,
-            version=version,
-        )
+    # elif "17" in dataset_name:
+    #     train_dataset = Endovis17Dataset(
+    #         data_root_dir=data_root_dir,
+    #         mode="train",
+    #         fold=fold,
+    #         vit_mode=vit_mode,
+    #         version=version,
+    #     )
     print(train_dataset.__len__())
     train_dataloader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, num_workers=4
+        train_dataset, batch_size=batch_size, shuffle=True#, num_workers=8
     )
 
     # training
@@ -330,7 +340,8 @@ for epoch in range(num_epochs):
         log_file,
     )
     # log results to wandb
-    wandb_logger.log_results(endovis_results)
+    if log_data:
+        wandb_logger.log_results(endovis_results)
 
     # save the model with the best challenge IoU
     if endovis_results["challengIoU"] > best_challenge_iou_val:
@@ -351,4 +362,5 @@ for epoch in range(num_epochs):
         )
 
 # close wandb
-wandb_logger.close()
+if log_data:
+    wandb_logger.close()
