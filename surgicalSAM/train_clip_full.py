@@ -63,7 +63,7 @@ batch_size = 24  # 32  # 32
 vit_mode = "h"  # "h"
 use_agumentation = True
 # for logger
-w_project_name = "surgicalSAM - Endovis 2018 - CLIP"
+w_project_name = "surgicalSAM - Endovis 2018 - SSAM-clip-full"
 c_loss_temp = 0.07
 log_data = True
 n_w = 8
