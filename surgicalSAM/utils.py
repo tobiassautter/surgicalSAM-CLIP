@@ -5,6 +5,7 @@ import os
 import os.path as osp 
 import re
 # find system path characters
+import logging
 
 sep = str(os.sep)
 
@@ -42,10 +43,9 @@ def create_binary_masks(binary_masks, preds, preds_quality, mask_names, thr, nor
             "mask": pred_mask,
             "mask_quality": pred_quality.item()
         })
-
- 
         
     return binary_masks
+
         
 
 def create_endovis_masks(binary_masks, H, W, normalize_masks=False):
