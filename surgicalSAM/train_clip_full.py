@@ -56,8 +56,8 @@ dataset_name = args.dataset
 fold = args.fold
 thr = 0
 seed = 123  # 666
-# data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
-data_root_dir = osp.join("..", "data", dataset_name)
+data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
+# data_root_dir = osp.join("..", "data", dataset_name)
 print("Data Root Dir: ", data_root_dir)
 batch_size = 24  # 32  # 32
 vit_mode = "h"  # "h"
