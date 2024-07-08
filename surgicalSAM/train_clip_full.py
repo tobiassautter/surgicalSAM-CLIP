@@ -59,13 +59,14 @@ seed = 123  # 666
 # data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
 data_root_dir = osp.join("..", "data", dataset_name)
 print("Data Root Dir: ", data_root_dir)
-batch_size = 16  # 32  # 32
+batch_size = 24  # 32  # 32
 vit_mode = "h"  # "h"
 use_agumentation = True
 # for logger
 w_project_name = "surgicalSAM - Endovis 2018 - CLIP"
 c_loss_temp = 0.07
-log_data = False
+log_data = True
+n_w = 8
 
 
 # set seed for reproducibility
@@ -85,14 +86,14 @@ if "18" in dataset_name:
     )
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
-    num_epochs = 100  # 500
-    lr = 0.001  # 0.001
-    save_dir = osp.join("..", "work_dirs", "endovis_2018")
+    num_epochs = 500  # 500
+    lr = 0.0008  # 0.001
+    save_dir = osp.join("work_dirs", "endovis_2018")
     # "./work_dirs/endovis_2018/"
 
 
 val_dataloader = DataLoader(
-    val_dataset, batch_size=batch_size, shuffle=True, num_workers=4
+    val_dataset, batch_size=batch_size, shuffle=True, num_workers=n_w
 )
 
 
@@ -166,15 +167,6 @@ with open(sam_checkpoint, "rb") as f:
         sam_pn_embeddings_weight_ckp
     )
 
-for name, param in learnable_prototypes_model.named_parameters():
-    param.requires_grad = True
-
-for name, param in protoype_prompt_encoder.named_parameters():
-    if "pn_cls_embeddings" in name:
-        param.requires_grad = False
-    else:
-        param.requires_grad = True
-
 print("======> Define Optmiser and Loss")
 seg_loss_model = DiceLoss().cuda()
 # contrastive_loss_model = losses.NTXentLoss(temperature=c_loss_temp).cuda()  # 0.07
@@ -210,6 +202,7 @@ if log_data:
             "epochs": num_epochs,
             "temperature": c_loss_temp,
             "batch_size": batch_size,
+            "num workers": n_w,
         },
     )
 
@@ -243,13 +236,13 @@ for epoch in range(num_epochs):
     # print(train_dataset.__len__())
 
     train_dataloader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, num_workers=4
+        train_dataset, batch_size=batch_size, shuffle=True, num_workers=n_w
     )
 
     # training
-    # protoype_prompt_encoder.train()
+    protoype_prompt_encoder.eval()  # .train()
     sam_decoder.train()
-    # learnable_prototypes_model.train()
+    learnable_prototypes_model.eval()  # .train()
 
     for sam_feats, _, cls_ids, masks, class_embeddings in train_dataloader:
 
@@ -286,9 +279,9 @@ for epoch in range(num_epochs):
 
     # validation
     binary_masks = dict()
-    # protoype_prompt_encoder.eval()
+    protoype_prompt_encoder.eval()
     sam_decoder.eval()
-    # learnable_prototypes_model.eval()
+    learnable_prototypes_model.eval()
 
     with torch.no_grad():
         prototypes = learnable_prototypes_model()
