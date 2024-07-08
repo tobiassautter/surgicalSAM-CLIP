@@ -8,7 +8,8 @@ class Prototype_Prompt_Encoder(nn.Module):
                         hidden_dim_dense=128, 
                         hidden_dim_sparse=128, 
                         size=64, 
-                        num_tokens=8):
+                        num_tokens=8,
+                        num_cls=7):
                 
         super(Prototype_Prompt_Encoder, self).__init__()
         self.dense_fc_1 = nn.Conv2d(feat_dim, hidden_dim_dense, 1)
@@ -19,6 +20,7 @@ class Prototype_Prompt_Encoder(nn.Module):
         self.sparse_fc_1 = nn.Conv1d(size*size, hidden_dim_sparse, 1)
         self.sparse_fc_2 = nn.Conv1d(hidden_dim_sparse, num_tokens, 1)
         
+        self.num_cls = num_cls
         
         pn_cls_embeddings = [nn.Embedding(num_tokens, feat_dim) for _ in range(2)] # one for positive and one for negative 
 
@@ -26,7 +28,7 @@ class Prototype_Prompt_Encoder(nn.Module):
         self.pn_cls_embeddings = nn.ModuleList(pn_cls_embeddings)
                 
     def forward(self, feat, prototypes, cls_ids):
-  
+
         cls_prompts = prototypes.unsqueeze(-1)
         cls_prompts = torch.stack([cls_prompts for _ in range(feat.size(0))], dim=0)
 
@@ -42,7 +44,7 @@ class Prototype_Prompt_Encoder(nn.Module):
         feat_sparse = feat.clone()
         
         # compute dense embeddings
-        one_hot = torch.nn.functional.one_hot(cls_ids-1,7) 
+        one_hot = torch.nn.functional.one_hot(cls_ids-1, self.num_cls) #7) 
         feat = feat[one_hot ==1]
         feat = rearrange(feat,'b (h w) c -> b c h w', h=64, w=64)
         dense_embeddings = self.dense_fc_2(self.relu(self.dense_fc_1(feat)))
@@ -50,7 +52,7 @@ class Prototype_Prompt_Encoder(nn.Module):
         # compute sparse embeddings
         feat_sparse = rearrange(feat_sparse,'b num_cls hw c -> (b num_cls) hw c')
         sparse_embeddings = self.sparse_fc_2(self.relu(self.sparse_fc_1(feat_sparse)))
-        sparse_embeddings = rearrange(sparse_embeddings,'(b num_cls) n c -> b num_cls n c', num_cls=7)
+        sparse_embeddings = rearrange(sparse_embeddings,'(b num_cls) n c -> b num_cls n c', num_cls= self.num_cls) #7)
         
         pos_embed = self.pn_cls_embeddings[1].weight.unsqueeze(0).unsqueeze(0) * one_hot.unsqueeze(-1).unsqueeze(-1)
         neg_embed = self.pn_cls_embeddings[0].weight.unsqueeze(0).unsqueeze(0) * (1-one_hot).unsqueeze(-1).unsqueeze(-1)

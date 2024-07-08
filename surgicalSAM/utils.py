@@ -8,15 +8,16 @@ import re
 
 sep = str(os.sep)
 
-def create_binary_masks(binary_masks, preds, preds_quality, mask_names, thr):
+def create_binary_masks(binary_masks, preds, preds_quality, mask_names, thr, normalize_masks=False):
 
     """Gather the predicted binary masks of different frames and classes into a dictionary, mask quality is also recorded
 
     Returns:
         dict: a dictionary containing all predicted binary masks organised based on sequence, frame, and mask name
     """
-    preds = preds.cpu()
-    preds_quality = preds_quality.cpu()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    preds = preds.to(device)
+    preds_quality = preds_quality.to(device)
     
     pred_masks = (preds > thr).int()
     
@@ -32,17 +33,22 @@ def create_binary_masks(binary_masks, preds, preds_quality, mask_names, thr):
         
         if frame_name not in binary_masks[seq_name].keys():
             binary_masks[seq_name][frame_name] = list()
+        
+        if normalize_masks:
+            pred_mask = torch.clamp(pred_mask * 100, 0, 1)
             
         binary_masks[seq_name][frame_name].append({
             "mask_name": mask_name,
             "mask": pred_mask,
             "mask_quality": pred_quality.item()
         })
+
+ 
         
     return binary_masks
         
 
-def create_endovis_masks(binary_masks, H, W):
+def create_endovis_masks(binary_masks, H, W, normalize_masks=False):
     """given the dictionary containing all predicted binary masks, compute final prediction of each frame and organise the prediction masks into a dictionary
        H - height of image 
        W - width of image
@@ -68,8 +74,12 @@ def create_endovis_masks(binary_masks, H, W):
             for binary_mask in binary_masks_list:
                 mask_name  = binary_mask["mask_name"]
                 predicted_label = int(re.search(r"class(\d+)", mask_name).group(1))
-                mask = binary_mask["mask"].numpy()
+                mask = binary_mask["mask"].detach().cpu().numpy() #added detach and set to cpu
                 endovis_mask[mask==1] = predicted_label
+
+            if normalize_masks:
+                endovis_mask[endovis_mask > 0] = 1
+
 
             endovis_mask = endovis_mask.astype(int)
 

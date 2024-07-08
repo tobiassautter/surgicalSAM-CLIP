@@ -17,7 +17,20 @@ class ProjectionLayer(nn.Module):
         return F.normalize(self.projection(x), p=2, dim=-1)
 
 class CLIPEmbeddings:
-    def __init__(self, model_name="openai/clip-vit-base-patch32", output_dim=256):
+    """
+    Class to get embeddings from the CLIP model
+    
+    Args:
+    - model_name: The name of the CLIP model to use
+    - output_dim: The dimension of the output embeddings
+    - instrument_details: The detailed descriptions of the instruments to get embeddings for
+    
+    Returns:
+    - text_features: The embeddings for the detailed descriptions of the instruments
+    """
+    
+    
+    def __init__(self, model_name="openai/clip-vit-base-patch32", output_dim=256, pI=[]):
         self.clip_model = CLIPModel.from_pretrained(model_name)
         self.clip_processor = CLIPProcessor.from_pretrained(model_name)
         
@@ -26,22 +39,25 @@ class CLIPEmbeddings:
         self.output_dim = output_dim
 
         self.instrument_details = [
-            "Bipolar Forceps",
-            "Prograsp Forceps",
-            "Large Needle Driver",
-            "Monopolar Curved Scissors",
-            "Ultrasound Probe",
-            "Suction Instrument",
-            "Clip Applier",
-        ]
+                "Bipolar Forceps",
+                "Prograsp Forceps",
+                "Large Needle Driver",
+                "Monopolar Curved Scissors",
+                "Ultrasound Probe",
+                "Suction Instrument",
+                "Clip Applier",
+            ]
+        
+        if len(pI) > 0:
+            self.instrument_details = pI
 
     def get_embeddings(self):
         # Tokenize and encode the detailed descriptions
         inputs = self.clip_processor(
-            text=self.instrument_details, return_tensors="pt", padding=True
+            text = self.instrument_details, return_tensors="pt", padding=True
         )
-        with torch.no_grad():
-            text_features = self.clip_model.get_text_features(**inputs)
+        #with torch.no_grad():
+        text_features = self.clip_model.get_text_features(**inputs)
 
         # Normalize the embeddings
         text_features = torch.nn.functional.normalize(text_features, p=2, dim=-1)
