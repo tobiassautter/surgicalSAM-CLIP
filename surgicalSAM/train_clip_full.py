@@ -136,13 +136,13 @@ instrument_details = [
 # clip_emb = clip_model_emb.get_emb(output_dim=256)
 feat_dim = 256
 clip_embeddings_handler = cl_em_dt.CLIPEmbeddings(
-    output_dim=feat_dim, pI=instrument_details
+    # output_dim=feat_dim, pI=instrument_details
 )
 clip_emb = clip_embeddings_handler.get_embeddings().cuda()
 
 print("======> Load Prototypes and Prototype-based Prompt Encoder")
 learnable_prototypes_model = Learnable_Prototypes(
-    num_classes=7, feat_dim=feat_dim, clip_embeddings=clip_emb
+    num_classes=len(instrument_details), feat_dim=feat_dim, clip_embeddings=clip_emb
 ).cuda()
 
 protoype_prompt_encoder = Prototype_Prompt_Encoder(
@@ -341,11 +341,11 @@ for epoch in range(num_epochs):
 
         torch.save(
             {
-                "prototype_prompt_encoder_state_dict": protoype_prompt_encoder.state_dict(),
+                # "prototype_prompt_encoder_state_dict": protoype_prompt_encoder.state_dict(),
                 "sam_decoder_state_dict": sam_decoder.state_dict(),
-                "prototypes_state_dict": learnable_prototypes_model.state_dict(),
+                # "prototypes_state_dict": learnable_prototypes_model.state_dict(),
             },
-            osp.join(save_dir, "model_ckp_SSAM_random.pth"),
+            osp.join(save_dir, "model_ckp_SSAM_updated.pth"),
         )
 
         print_log(
