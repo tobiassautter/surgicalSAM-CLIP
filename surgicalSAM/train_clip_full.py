@@ -121,9 +121,23 @@ for name, param in sam_decoder.named_parameters():
 
 # load clip embeddings
 print("======> Load CLIP Embeddings")
+
+instrument_details = [
+    "Son Goku",
+    "Voldemort",
+    "Cat Dog",
+    "Violin",
+    "Snake",
+    "Elden Ring",
+    "Potato",
+]
+
+
 # clip_emb = clip_model_emb.get_emb(output_dim=256)
 feat_dim = 256
-clip_embeddings_handler = cl_em_dt.CLIPEmbeddings(output_dim=feat_dim)
+clip_embeddings_handler = cl_em_dt.CLIPEmbeddings(
+    output_dim=feat_dim, pI=instrument_details
+)
 clip_emb = clip_embeddings_handler.get_embeddings().cuda()
 
 print("======> Load Prototypes and Prototype-based Prompt Encoder")
@@ -184,7 +198,7 @@ optimiser = torch.optim.Adam(
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
-log_file = osp.join(save_dir, "log_clip_SS.txt")
+log_file = osp.join(save_dir, "log_clip_SS_random.txt")
 print_log(str(args), log_file)
 
 print("======> Start Training and Validation")
@@ -331,7 +345,7 @@ for epoch in range(num_epochs):
                 "sam_decoder_state_dict": sam_decoder.state_dict(),
                 "prototypes_state_dict": learnable_prototypes_model.state_dict(),
             },
-            osp.join(save_dir, "model_ckp_SSAM.pth"),
+            osp.join(save_dir, "model_ckp_SSAM_random.pth"),
         )
 
         print_log(
