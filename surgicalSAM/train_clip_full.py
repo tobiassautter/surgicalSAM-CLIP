@@ -59,7 +59,7 @@ seed = 123  # 666
 data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
 # data_root_dir = osp.join("..", "data", dataset_name)
 print("Data Root Dir: ", data_root_dir)
-batch_size = 24  # 32  # 32
+batch_size = 16  # 32  # 32
 vit_mode = "h"  # "h"
 use_agumentation = True
 # for logger
