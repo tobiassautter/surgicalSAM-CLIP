@@ -14,6 +14,7 @@ from utils import (
     create_endovis_masks,
     eval_endovis,
 )
+import os.path as osp
 
 
 print("======> Process Arguments")
@@ -49,7 +50,8 @@ print("======> Load Dataset-Specific Parameters")
 if "18" in dataset_name:
     num_tokens = 2
     dataset = Endovis18Dataset(data_root_dir=data_root_dir, mode="val", vit_mode="b")
-    surgicalSAM_ckp = f"../ckp/surgicalMDSAM/{dataset_name}/model_ckp_lite.pth"
+    #surgicalSAM_ckp = f"../ckp/surgicalMDSAM/{dataset_name}/model_ckp_lite.pth"
+    surgicalSAM_ckp = osp.join("..", "ckp", "surgicalMDSAM", dataset_name, "model_ckp_lite.pth")
 
     # debug check
     print(f"surgicalSAM_ckp: {surgicalSAM_ckp}")
@@ -68,7 +70,7 @@ elif "17" in dataset_name:
         data_root_dir=data_root_dir, mode="val", fold=fold
     )
 
-dataloader = DataLoader(dataset, batch_size=1, shuffle=True, num_workers=4)
+dataloader = DataLoader(dataset, batch_size=1, shuffle=True , num_workers=0)
 
 
 print("======> Load SAM")
