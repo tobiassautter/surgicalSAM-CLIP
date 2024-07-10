@@ -65,7 +65,7 @@ w_project_name = "surgicalSAM - Endovis 2018 - SSAM-clip-full"
 c_loss_temp = 0.07
 log_data = True
 isWindows = False
-n_w = 8
+n_w = 4
 
 if not isWindows:
     data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
@@ -131,19 +131,12 @@ for name, param in sam_decoder.named_parameters():
 print("======> Load CLIP Embeddings")
 
 instrument_details = [
-    "bipolar forceps",
     "bipolar forceps have a slim, elongated tweezer-like design with opposing tips, are silver-colored, made from high-quality metal, and feature an insulated shaft for controlled energy application.",
-    "prograsp forceps",
     "prograsp forceps possess curved scissor-like handles, specialized grasping tips with interlocking jaws, a ratcheting mechanism, and color-coded markings for easy identification during surgery.",
-    "needle driver",
     "large needle drivers feature elongated handles, sturdy gripping surfaces, a curved or straight jaw tip for securely holding needles, and a locking mechanism to ensure precision and control.",
-    "monopolar curved scissors",
     "monopolar curved scissors showcase elongated handles, curved cutting edges for precise dissection, and an insulated shaft, allowing controlled application of electrical energy for cutting and coagulation.",
-    "ultrasound probe",
     "ultrasound probes feature a long, slender handle, a small transducer head for producing ultrasound waves, and a flexible cable connecting the probe to the ultrasound machine for real-time imaging guidance.",
-    "suction insturments",
     "suction instruments appear as elongated tubes with a narrow, hollow tip for fluid and debris removal, connected to a handle and tubing system for vacuum generation and precise control during the procedure.",
-    "clip appliers",
     "clip appliers feature elongated handles, a shaft with a specialized tip for holding and releasing clips, and a mechanism to advance and deploy the clips precisely for secure tissue or vessel closure.",
 ]
 
