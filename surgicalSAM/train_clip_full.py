@@ -56,9 +56,7 @@ dataset_name = args.dataset
 fold = args.fold
 thr = 0
 seed = 123  # 666
-# data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
-data_root_dir = osp.join("..", "data", dataset_name)
-print("Data Root Dir: ", data_root_dir)
+
 batch_size = 16  # 32  # 32
 vit_mode = "h"  # "h"
 use_agumentation = True
@@ -68,6 +66,12 @@ c_loss_temp = 0.07
 log_data = True
 isWindows = False
 n_w = 8
+
+if not isWindows:
+    data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
+else:
+    data_root_dir = osp.join("..", "data", dataset_name)
+print("Data Root Dir: ", data_root_dir)
 
 
 # set seed for reproducibility
