@@ -131,8 +131,8 @@ class CLIPEmbeddings:
 
 
 # Example use of the CLIPEmbeddings class
-clip_embeddings = CLIPEmbeddings()
-text_embeddings = clip_embeddings.get_embeddings()
-print(
-    text_embeddings.shape
-)  # Should output something like [7, 256] based on the number of instruments
+# clip_embeddings = CLIPEmbeddings()
+# text_embeddings = clip_embeddings.get_embeddings()
+# print(
+#     text_embeddings.shape
+# )  # Should output something like [7, 256] based on the number of instruments

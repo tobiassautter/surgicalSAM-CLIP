@@ -56,17 +56,17 @@ dataset_name = args.dataset
 fold = args.fold
 thr = 0
 seed = 123  # 666
-data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
-# data_root_dir = osp.join("..", "data", dataset_name)
+#data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
+data_root_dir = osp.join("..", "data", dataset_name)
 print("Data Root Dir: ", data_root_dir)
 batch_size = 16  # 32  # 32
 vit_mode = "h"  # "h"
-use_agumentation = True
+use_agumentation = False
 # for logger
 w_project_name = "surgicalSAM - Endovis 2018 - SSAM-clip-full"
 c_loss_temp = 0.07
-log_data = True
-n_w = 8
+log_data = False
+n_w = 0
 
 
 # set seed for reproducibility
@@ -86,8 +86,8 @@ if "18" in dataset_name:
     )
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
-    num_epochs = 500  # 500
-    lr = 0.0008  # 0.001
+    num_epochs = 50  # 500
+    lr = 0.0005  # 0.001
     save_dir = osp.join("work_dirs", "endovis_2018")
     # "./work_dirs/endovis_2018/"
 
@@ -123,20 +123,26 @@ for name, param in sam_decoder.named_parameters():
 print("======> Load CLIP Embeddings")
 
 instrument_details = [
-    "Son Goku",
-    "Voldemort",
-    "Cat Dog",
-    "Violin",
-    "Snake",
-    "Elden Ring",
-    "Potato",
-]
 
+                "bipolar forceps have a slim, elongated tweezer-like design with opposing tips, are silver-colored, made from high-quality metal, and feature an insulated shaft for controlled energy application.",
+
+                "prograsp forceps possess curved scissor-like handles, specialized grasping tips with interlocking jaws, a ratcheting mechanism, and color-coded markings for easy identification during surgery.",
+
+                "large needle drivers feature elongated handles, sturdy gripping surfaces, a curved or straight jaw tip for securely holding needles, and a locking mechanism to ensure precision and control.",
+
+                "monopolar curved scissors showcase elongated handles, curved cutting edges for precise dissection, and an insulated shaft, allowing controlled application of electrical energy for cutting and coagulation.",
+
+                "ultrasound probes feature a long, slender handle, a small transducer head for producing ultrasound waves, and a flexible cable connecting the probe to the ultrasound machine for real-time imaging guidance.",
+
+                "suction instruments appear as elongated tubes with a narrow, hollow tip for fluid and debris removal, connected to a handle and tubing system for vacuum generation and precise control during the procedure.",
+
+                "clip appliers feature elongated handles, a shaft with a specialized tip for holding and releasing clips, and a mechanism to advance and deploy the clips precisely for secure tissue or vessel closure.",
+]
 
 # clip_emb = clip_model_emb.get_emb(output_dim=256)
 feat_dim = 256
 clip_embeddings_handler = cl_em_dt.CLIPEmbeddings(
-    # output_dim=feat_dim, pI=instrument_details
+    output_dim=feat_dim, pI=instrument_details
 )
 clip_emb = clip_embeddings_handler.get_embeddings().cuda()
 
@@ -341,9 +347,9 @@ for epoch in range(num_epochs):
 
         torch.save(
             {
-                # "prototype_prompt_encoder_state_dict": protoype_prompt_encoder.state_dict(),
+                "prototype_prompt_encoder_state_dict": protoype_prompt_encoder.state_dict(),
                 "sam_decoder_state_dict": sam_decoder.state_dict(),
-                # "prototypes_state_dict": learnable_prototypes_model.state_dict(),
+                "prototypes_state_dict": learnable_prototypes_model.state_dict(),
             },
             osp.join(save_dir, "model_ckp_SSAM_updated.pth"),
         )
