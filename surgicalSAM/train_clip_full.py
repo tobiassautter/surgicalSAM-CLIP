@@ -161,6 +161,7 @@ protoype_prompt_encoder = Prototype_Prompt_Encoder(
     hidden_dim_sparse=128,
     size=64,
     num_tokens=num_tokens,
+    num_cls=len(instrument_details),
 ).cuda()
 
 # freeze the prototype encoder
