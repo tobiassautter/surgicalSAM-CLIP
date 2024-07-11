@@ -82,6 +82,7 @@ pr_F = 2
 p_w = True
 
 isWindows = args.isWindows
+print("Is Windows: ", isWindows)
 
 if isWindows:
     data_root_dir = osp.join("..", "data", dataset_name)
@@ -233,7 +234,7 @@ optimiser = torch.optim.Adam(
     weight_decay=0.0001,  # 0.0001,
 )
 # add linear scheduler
-scheduler = LinearLR(optimiser, end_epoch=num_epochs, start_lr=lr, end_lr=0.0001)
+scheduler = LinearLR(optimiser, start_factor=1, end_factor=0.002, total_iters=num_epochs)
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
