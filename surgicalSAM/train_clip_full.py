@@ -71,7 +71,7 @@ seed = 123  # 666
 batch_size = 16  # 32  # 32
 vit_mode = "h"  # "h"
 use_agumentation = True
-log_data = False
+log_data = True
 # for logger
 w_project_name = "surgicalSAM - Endovis 2018 - SSAM-clip-full"
 c_loss_temp = 0.07
@@ -232,7 +232,8 @@ optimiser = torch.optim.Adam(
     lr=lr,
     weight_decay=0.0001,  # 0.0001,
 )
-
+# add linear scheduler
+scheduler = LinearLR(optimiser, end_epoch=num_epochs, start_lr=lr, end_lr=0.0001)
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
@@ -369,6 +370,15 @@ for epoch in range(num_epochs):
 
     endovis_masks = create_endovis_masks(binary_masks, 1024, 1280)
     endovis_results = eval_endovis(endovis_masks, gt_endovis_masks)
+
+    # update learning rate
+    scheduler.step()
+
+    # print learning rate
+    print_log(
+        f"Epoch: {epoch}/{num_epochs-1}; Learning Rate: {scheduler.get_last_lr()}",
+        log_file,
+    )
 
     # print validation results in log
     print_log(
