@@ -60,12 +60,17 @@ seed = 123  # 666
 batch_size = 16  # 32  # 32
 vit_mode = "h"  # "h"
 use_agumentation = True
+log_data = False
 # for logger
 w_project_name = "surgicalSAM - Endovis 2018 - SSAM-clip-full"
 c_loss_temp = 0.07
-log_data = True
-isWindows = False
 n_w = 4
+isWindows = True
+
+if isWindows:
+    n_w = 0
+    log_data = False
+    use_agumentation = False
 
 if not isWindows:
     data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
