@@ -92,7 +92,7 @@ seed = 123  # 666
 batch_size = 16  # 32  # 32
 vit_mode = "h"  # "h"
 use_agumentation = True
-log_data = True
+log_data = args.log
 # for logger
 w_project_name = "surgicalSAM - Endovis 2018 - SSAM-clip-full"
 c_loss_temp = 0.07
@@ -107,7 +107,6 @@ print("Is Windows: ", isWindows)
 
 if isWindows:
     data_root_dir = osp.join("..", "data", dataset_name)
-    log_data = False
     use_agumentation = False
     
     n_w = 0
