@@ -87,3 +87,13 @@ class Learnable_Prototypes(nn.Module):
         
     def forward(self):
         return self.class_embeddings.weight
+    
+
+
+class Learnable_Prototypes_old(nn.Module):
+    def __init__(self, num_classes=7 , feat_dim=256):
+        super(Learnable_Prototypes_old, self).__init__()
+        self.class_embeddings = nn.Embedding(num_classes, feat_dim)
+        
+    def forward(self):
+        return self.class_embeddings.weight
