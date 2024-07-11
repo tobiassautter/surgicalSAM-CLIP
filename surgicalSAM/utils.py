@@ -73,8 +73,11 @@ def create_endovis_masks(binary_masks, H, W, dataset_name="endovis_2018"):
             endovis_mask = endovis_mask.cpu().numpy().astype(int)  # Move to CPU and convert to numpy array
 
             if dataset_name == "endovis_2017":
+                # split frane at _ and appent .png
                 frame = frame.split("_")[0]
+
                 seq_path = osp.join(seq, f"{frame}.png")
+                "(['seq1\\00000_class1.png', "
             elif dataset_name == "endovis_2018":  # Default to endovis_2018 or other datasets with similar naming conventions
                 seq_path = osp.join(seq, "{}.png".format(frame))
             else:
@@ -209,9 +212,8 @@ def eval_endovis(endovis_masks, gt_endovis_masks):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     for file_name, prediction in endovis_masks.items():
-        prediction = torch.tensor(prediction, device=device)
-        #full_mask = torch.tensor(gt_endovis_masks[file_name]).clone().detach().to(device)
-        full_mask = torch.as_tensor(gt_endovis_masks[file_name], device=device).clone().detach().requires_grad_(False)
+        prediction = torch.tensor(prediction, device=device, dtype=torch.float32)
+        full_mask = torch.tensor(gt_endovis_masks[file_name], device=device, dtype=torch.float32)
         
         im_iou = []
         im_iou_challenge = []
@@ -250,16 +252,16 @@ def eval_endovis(endovis_masks, gt_endovis_masks):
     mean_im_iou = np.mean(all_im_iou_acc)
     mean_im_iou_challenge = np.mean(all_im_iou_acc_challenge)
 
-    final_class_im_iou = torch.zeros(num_classes + 2, device=device)
+    final_class_im_iou = torch.zeros(num_classes + 2, device=device, dtype=torch.float32)
     cIoU_per_class = []
     for c in range(1, num_classes + 1):
         if len(class_ious[c]) > 0:
-            final_class_im_iou[c-1] = torch.tensor(class_ious[c], device=device).mean()
+            final_class_im_iou[c-1] = torch.tensor(class_ious[c], device=device, dtype=torch.float32).mean()
             cIoU_per_class.append(round((final_class_im_iou[c-1].item() * 100), 3))
         else:
             cIoU_per_class.append(0)
         
-    mean_class_iou = torch.tensor([torch.tensor(values, device=device).mean() for c, values in class_ious.items() if len(values) > 0]).mean().item()
+    mean_class_iou = torch.tensor([torch.tensor(values, device=device, dtype=torch.float32).mean() for c, values in class_ious.items() if len(values) > 0], dtype=torch.float32).mean().item()
     
     endovis_results["challengIoU"] = round(mean_im_iou_challenge*100, 3)
     endovis_results["IoU"] = round(mean_im_iou*100, 3)
@@ -269,6 +271,7 @@ def eval_endovis(endovis_masks, gt_endovis_masks):
     endovis_results["cIoU_per_class"] = cIoU_per_class
     
     return endovis_results
+
 
 
 
