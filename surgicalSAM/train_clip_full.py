@@ -75,16 +75,20 @@ log_data = False
 # for logger
 w_project_name = "surgicalSAM - Endovis 2018 - SSAM-clip-full"
 c_loss_temp = 0.07
+
+# specs for DataLoader
 n_w = 4
 pr_F = 2
 p_w = True
+
 isWindows = args.isWindows
 
 if isWindows:
     data_root_dir = osp.join("..", "data", dataset_name)
-    n_w = 0
     log_data = False
     use_agumentation = False
+    
+    n_w = 0
     pr_F = None
     p_w = False
 
@@ -119,8 +123,9 @@ if "18" in dataset_name:
 val_dataloader = DataLoader(
     val_dataset,
     batch_size=batch_size,  # Adjust batch size if memory allows
-    shuffle=False,
+    shuffle=True,
     num_workers=n_w,  # Increase the number of workers
+    
     pin_memory=True,  # Use pinned memory
     prefetch_factor=pr_F,  # Prefetch batches
     persistent_workers=p_w  # Keep workers alive between epochs
@@ -289,8 +294,9 @@ for epoch in range(num_epochs):
     train_dataloader = DataLoader(
         train_dataset,
         batch_size=batch_size,  # Adjust batch size if memory allows
-        shuffle=False,
+        shuffle=True,
         num_workers=n_w,  # Increase the number of workers
+        
         pin_memory=True,  # Use pinned memory
         prefetch_factor=pr_F,  # Prefetch batches
         persistent_workers=p_w  # Keep workers alive between epochs
