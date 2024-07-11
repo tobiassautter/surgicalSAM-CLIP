@@ -33,6 +33,16 @@ import wandb_logger
 ## import clip_model_emb.py
 import tools.clip_model_emb as cl_em_dt
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
 print("======> Process Arguments")
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -52,11 +62,22 @@ parser.add_argument(
 
 parser.add_argument(
     "--isWindows",
-    type=bool,
+    type=str2bool,
+    nargs='?',
+    const=True,
     default=False,
-    choices=[False, True],
-    help="specify if the OS is Windows",
+    help="specify if the OS is Windows"
 )
+
+parser.add_argument(
+    "--log",
+    type=str2bool,
+    nargs='?',
+    const=True,
+    default=False,
+    help="specify if the logs on wandb"
+)
+
 
 args = parser.parse_args()
 
@@ -128,7 +149,7 @@ val_dataloader = DataLoader(
     num_workers=n_w,  # Increase the number of workers
     
     pin_memory=True,  # Use pinned memory
-    #prefetch_factor=pr_F,  # Prefetch batches
+    prefetch_factor=pr_F,  # Prefetch batches
     persistent_workers=p_w  # Keep workers alive between epochs
 )
 
@@ -300,7 +321,7 @@ for epoch in range(num_epochs):
         num_workers=n_w,  # Increase the number of workers
 
         pin_memory=True,  # Use pinned memory
-        #prefetch_factor=pr_F,  # Prefetch batches
+        prefetch_factor=pr_F,  # Prefetch batches
         persistent_workers=p_w  # Keep workers alive between epochs
     )
 
