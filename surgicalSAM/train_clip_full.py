@@ -53,6 +53,8 @@ args = parser.parse_args()
 
 print("======> Set Parameters for Training")
 dataset_name = args.dataset
+data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
+
 fold = args.fold
 thr = 0
 seed = 123  # 666
@@ -65,18 +67,17 @@ log_data = False
 w_project_name = "surgicalSAM - Endovis 2018 - SSAM-clip-full"
 c_loss_temp = 0.07
 n_w = 4
+pr_F = 2
+p_w = True
 isWindows = True
 
 if isWindows:
+    data_root_dir = osp.join("..", "data", dataset_name)
     n_w = 0
     log_data = False
     use_agumentation = False
-
-if not isWindows:
-    data_root_dir = f"../../SurgicalSAM/data/{dataset_name}"
-else:
-    data_root_dir = osp.join("..", "data", dataset_name)
-print("Data Root Dir: ", data_root_dir)
+    pr_F = None
+    p_w = False
 
 
 # set seed for reproducibility
@@ -97,13 +98,23 @@ if "18" in dataset_name:
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
     num_epochs = 100  # 500
-    lr = 0.00025  # 0.001
+    lr = 0.05  # 0.001
     save_dir = osp.join("work_dirs", "endovis_2018")
     # "./work_dirs/endovis_2018/"
 
 
+# val_dataloader = DataLoader(
+#     val_dataset, batch_size=batch_size, shuffle=True, num_workers=n_w
+# )
+
 val_dataloader = DataLoader(
-    val_dataset, batch_size=batch_size, shuffle=True, num_workers=n_w
+    val_dataset,
+    batch_size=batch_size,  # Adjust batch size if memory allows
+    shuffle=False,
+    num_workers=n_w,  # Increase the number of workers
+    pin_memory=True,  # Use pinned memory
+    prefetch_factor=pr_F,  # Prefetch batches
+    persistent_workers=p_w  # Keep workers alive between epochs
 )
 
 
@@ -262,8 +273,18 @@ for epoch in range(num_epochs):
     #     )
     # print(train_dataset.__len__())
 
+    # train_dataloader = DataLoader(
+    #     train_dataset, batch_size=batch_size, shuffle=True, num_workers=n_w
+    # )
+
     train_dataloader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, num_workers=n_w
+        train_dataset,
+        batch_size=batch_size,  # Adjust batch size if memory allows
+        shuffle=False,
+        num_workers=n_w,  # Increase the number of workers
+        pin_memory=True,  # Use pinned memory
+        prefetch_factor=pr_F,  # Prefetch batches
+        persistent_workers=p_w  # Keep workers alive between epochs
     )
 
     # training
