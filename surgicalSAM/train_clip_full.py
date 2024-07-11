@@ -49,6 +49,15 @@ parser.add_argument(
     choices=[0, 1, 2, 3],
     help="specify fold number for endovis_2017 dataset",
 )
+
+parser.add_argument(
+    "--isWindows",
+    type=bool,
+    default=False,
+    choices=[False, True],
+    help="specify if the OS is Windows",
+)
+
 args = parser.parse_args()
 
 print("======> Set Parameters for Training")
@@ -69,7 +78,7 @@ c_loss_temp = 0.07
 n_w = 4
 pr_F = 2
 p_w = True
-isWindows = True
+isWindows = args.isWindows
 
 if isWindows:
     data_root_dir = osp.join("..", "data", dataset_name)
