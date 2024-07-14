@@ -11,13 +11,22 @@ from torch.utils.data import DataLoader
 from dataset import Endovis18Dataset, Endovis17Dataset
 from segment_anything import sam_model_registry
 from model import Learnable_Prototypes, Prototype_Prompt_Encoder
+
 from utils import (
+    # read_gt_endovis_masks,
+    # create_binary_masks,
+    # create_endovis_masks,
+    eval_endovis,
+)
+
+from utils_old import (
     print_log,
+    read_gt_endovis_masks,
     create_binary_masks,
     create_endovis_masks,
-    eval_endovis,
-    read_gt_endovis_masks,
+    #eval_endovis,
 )
+
 from model_forward import model_forward_function
 from loss import DiceLoss
 from pytorch_metric_learning import losses
@@ -131,8 +140,8 @@ if "18" in dataset_name:
     )
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
-    num_epochs = 300  # 500
-    lr = 0.005  # 0.001
+    num_epochs = 500  # 500
+    lr = 0.002  # 0.001
     save_dir = osp.join("work_dirs", "endovis_2018")
     # "./work_dirs/endovis_2018/"
 
@@ -254,7 +263,7 @@ optimiser = torch.optim.Adam(
     weight_decay=0.0001,  # 0.0001,
 )
 # add linear scheduler
-scheduler = LinearLR(optimiser, start_factor=1, end_factor=0.01, total_iters=num_epochs)
+scheduler = LinearLR(optimiser, start_factor=1, end_factor=0.25, total_iters=num_epochs)
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)

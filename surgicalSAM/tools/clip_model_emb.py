@@ -115,6 +115,7 @@ class CLIPEmbeddings:
         ]
 
         if len(pI) > 0:
+            print("Using custom instrument details")
             self.instrument_details = pI
 
     def get_embeddings(self):
