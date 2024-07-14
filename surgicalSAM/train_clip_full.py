@@ -34,7 +34,7 @@ from datetime import datetime
 
 # Exponantial LR
 from torch.optim.lr_scheduler import ExponentialLR
-from torch.optim.lr_scheduler import LinearLR
+#from torch.optim.lr_scheduler import LinearLR
 
 ## logger
 import wandb_logger
@@ -134,14 +134,14 @@ np.random.seed(seed)
 
 print("======> Load Dataset-Specific Parameters")
 if "18" in dataset_name:
-    num_tokens = 2
+    num_tokens = 4
     val_dataset = Endovis18Dataset(
         data_root_dir=data_root_dir, mode="val", vit_mode="h"
     )
 
     gt_endovis_masks = read_gt_endovis_masks(data_root_dir=data_root_dir, mode="val")
     num_epochs = 500  # 500
-    lr = 0.002  # 0.001
+    lr = 0.001  # 0.001
     save_dir = osp.join("work_dirs", "endovis_2018")
     # "./work_dirs/endovis_2018/"
 
@@ -263,7 +263,7 @@ optimiser = torch.optim.Adam(
     weight_decay=0.0001,  # 0.0001,
 )
 # add linear scheduler
-scheduler = LinearLR(optimiser, start_factor=1, end_factor=0.25, total_iters=num_epochs)
+#scheduler = LinearLR(optimiser, start_factor=1, end_factor=0.25, total_iters=num_epochs)
 
 print("======> Set Saving Directories and Logs")
 os.makedirs(save_dir, exist_ok=True)
@@ -402,13 +402,13 @@ for epoch in range(num_epochs):
     endovis_results = eval_endovis(endovis_masks, gt_endovis_masks)
 
     # update learning rate
-    scheduler.step()
+    #scheduler.step()
 
     # print learning rate
-    print_log(
-        f"Epoch: {epoch}/{num_epochs-1}; Learning Rate: {scheduler.get_last_lr()}",
-        log_file,
-    )
+    # print_log(
+    #     f"Epoch: {epoch}/{num_epochs-1}; Learning Rate: {scheduler.get_last_lr()}",
+    #     log_file,
+    # )
 
     # print validation results in log
     print_log(
