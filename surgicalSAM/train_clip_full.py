@@ -157,8 +157,8 @@ val_dataloader = DataLoader(
     num_workers=n_w,  # Increase the number of workers
     
     pin_memory=True,  # Use pinned memory
-    prefetch_factor=pr_F,  # Prefetch batches
-    persistent_workers=p_w  # Keep workers alive between epochs
+    #prefetch_factor=pr_F,  # Prefetch batches
+    #persistent_workers=p_w  # Keep workers alive between epochs
 )
 
 
@@ -329,8 +329,8 @@ for epoch in range(num_epochs):
         num_workers=n_w,  # Increase the number of workers
 
         pin_memory=True,  # Use pinned memory
-        prefetch_factor=pr_F,  # Prefetch batches
-        persistent_workers=p_w  # Keep workers alive between epochs
+        #prefetch_factor=pr_F,  # Prefetch batches
+        #persistent_workers=p_w  # Keep workers alive between epochs
     )
 
     # training
