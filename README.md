@@ -1,29 +1,8 @@
-<h2 align="center"> [AAAI2024] SurgicalSAM: Efficient Class Promptable Surgical Instrument Segmentation </h2>
-<p align="center">
-<a href="https://arxiv.org/abs/2308.08746v2"><img src="https://img.shields.io/badge/arXiv-Paper-<color>"></a>
-</p>
-<h5 align="center"><em>Wenxi Yue, Jing Zhang, Kun Hu, Yong Xia, Jiebo Luo, Zhiyong Wang</em></h5>
-<p align="center">
-  <a href="#news">News</a> |
-  <a href="#abstract">Abstract</a> |
-  <a href="#results">Results</a> |
-  <a href="#installation">Installation</a> |
-  <a href="#data">Data</a> |
-  <a href="#checkpoints">Checkpoints</a> |
-  <a href="#train">Train</a> |
-  <a href="#inference">Inference</a>
-</p>
 
-## News 
-
-**2023.12.28** - Our paper is accepted to **AAAI2024**. The processed training data, data preprocessing code, and training code are released.
-
-**2023.09.06** - The processed validation data, checkpoints, and inference code are released. 
-
-**2023.08.21** - The tech report is posted on arxiv. Work in progress.
-
-> Please also check out our latest work SurgicalPart-SAM for text promptable surgical instrument segmentation:
-> **SurgicalPart-SAM: Part-to-Whole Collaborative Prompting for Surgical Instrument Segmentation** ([**Paper**](https://arxiv.org/pdf/2312.14481.pdf) and [**Code**](https://github.com/wenxi-yue/SurgicalPart-SAM)).
+## Disclaimer
+This GIT Repo is a copy with modifications from the original paper https://arxiv.org/pdf/2308.08746v2 sugrical SAM.
+In this repo are tests for adding more generalizability with CLIP text embeddings under the branch clipDev. 
+There are also jupyter notebooks for visualization needs. Thanks to the original author **Wenxi Yue, Jing Zhang, Kun Hu, Yong Xia, Jiebo Luo, Zhiyong Wang** for making their work publicly available.
 
 
 ## Abstract 
@@ -188,6 +167,10 @@ python train.py  --dataset endovis_2018
 python train.py  --dataset endovis_2017  --fold 0
 ```
 
+## Add CLIP prompts
+
+
+
 ##  Inference
 To run inference on our provided SurgicalSAM checkpoints and obtain evaluation results:
 ```
@@ -213,11 +196,4 @@ If you find SurgicalSAM helpful, please consider citing:
 
 ##  Acknowledgement
 This project is built upon [Segment Anything](https://github.com/facebookresearch/segment-anything). We thank the authors for their great work.
-
-
-##  References
-[1] Allan, M.; Kondo, S.; Bodenstedt, S.; Leger, S.; Kadkhodamohammadi, R.; Luengo, I.; Fuentes, F.; Flouty, E.; Mohammed, A.; Pedersen, M.; Kori, A.; Alex, V.; Krishnamurthi, G.; Rauber, D.; Mendel, R.; Palm, C.; Bano, S.; Saibro, G.; Shih, C.-S.; Chiang, H.-A.; Zhuang, J.; Yang, J.; Iglovikov, V.; Dobrenkii, A.; Reddiboina, M.; Reddy, A.; Liu, X.; Gao, C.; Unberath, M.; Kim, M.; Kim, C.; Kim, C.; Kim, H.; Lee, G.; Ullah, I.; Luna, M.; Park, S. H.; Azizian, M.; Stoyanov, D.; Maier-Hein, L.; and Speidel, S. 2020. 2018 Robotic Scene Segmentation Challenge. arXiv:2001.11190.
-
-[2] Allan, M.; Shvets, A.; Kurmann, T.; Zhang, Z.; Duggal, R.; Su, Y.-H.; Rieke, N.; Laina, I.; Kalavakonda, N.; Bodenstedt, S.; Herrera, L.; Li, W.; Iglovikov, V.; Luo, H.; Yang, J.; Stoyanov, D.; Maier-Hein, L.; Speidel, S.; and Azizian, M. 2019. 2017 Robotic Instrument Segmentation Challenge. arXiv:1902.06426.
-
-[3] Gonz´alez, C.; Bravo-S´anchez, L.; and Arbelaez, P. 2020. ISINet: an instance-based approach for surgical instrument segmentation. In MICCAI, 595–605. Springer.
+Thanks to original authors of the git repo https://github.com/wenxi-yue/SurgicalSAM?tab=readme-ov-file .
