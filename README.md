@@ -162,8 +162,8 @@ After downloading the data and model checkpoints and preprocessing the data, the
 To train the model:
 ```
 cd surgicalSAM/
-python train.py  --dataset endovis_2018
-python train.py  --dataset endovis_2017  --fold 0
+python train_clip_full.py  --dataset endovis_2018 --isWindows True --log True
+python train_clip_full.py  --dataset endovis_2017  --fold 0 --isWindows True --log True
 ```
 
 ## Add CLIP prompts
@@ -182,18 +182,23 @@ instrument_details = [
 
 
 ##  Inference
-To run inference on our provided SurgicalSAM checkpoints and obtain evaluation results:
+To run inference on our provided SurgicalSAM checkpoints and obtain evaluation results you can use the original:
 ```
 cd surgicalSAM/
 python inference.py  --dataset endovis_2018
 python inference.py  --dataset endovis_2017  --fold 0
 ```
+Or for good visualisation of your results using the created Jupyter notebooks:
 
+```
+cd surgicalSAM/Jupyer Notebook Inference etc/
+juptyer-notebook inference_SSAM_clip.ipynb
+```
 The GPU memory usage for inference when using pre-computed feature is 2.16 GB. 
 
 ##  Citing SurgicalSAM
 
-If you find SurgicalSAM helpful, please consider citing:
+If you find SurgicalSAM helpful, please consider citing the original authors from surgical SAM:
 ```
 @article{yue_surgicalsam,
   title={SurgicalSAM: Efficient Class Promptable Surgical Instrument Segmentation},
