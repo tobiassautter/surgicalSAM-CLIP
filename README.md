@@ -8,20 +8,17 @@ There are also jupyter notebooks for visualization needs. Thanks to the original
 ## Abstract 
 The Segment Anything Model (SAM) is a powerful foundation model that has revolutionised image segmentation. To apply SAM to surgical instrument segmentation, a common approach is to locate precise points or boxes of instruments and then use them as prompts for SAM in a zero-shot manner. However, we observe two problems with this naive pipeline: (1) the domain gap between natural objects and surgical instruments leads to poor generalisation of SAM; and (2) SAM relies on precise point or box locations for accurate segmentation, requiring either extensive manual guidance or a well-performing specialist detector for prompt preparation, which leads to a complex multi-stage pipeline. To address these problems, we introduce SurgicalSAM, a novel end-to-end efficient-tuning approach for SAM to effectively integrate surgical-specific information with SAM's pre-trained knowledge for improved generalisation. Specifically, we propose a lightweight prototype-based class prompt encoder for tuning, which directly generates prompt embeddings from class prototypes and eliminates the use of explicit prompts for improved robustness and a simpler pipeline. In addition, to address the low inter-class variance among surgical instrument categories, we propose contrastive prototype learning, further enhancing the discrimination of the class prototypes for more accurate class prompting. The results of extensive experiments on both EndoVis2018 and EndoVis2017 datasets demonstrate that SurgicalSAM achieves state-of-the-art performance while only requiring a small number of tunable parameters.
 
-![](assets/method.png)
+![](assets/ssclip.png)
 <figcaption align = "center"><b>Figure 1: Overview of SurgicalSAM. 
  </b></figcaption>
  
 ## Results
 
 <p align="center">
-  <img src="assets/vis_1.png" alt="Image Description" width="700" height="YOUR_HEIGHT">
+  <img src="assets/ssam_clip_full_segmentatios.png" alt="Image Description" width="700" height="YOUR_HEIGHT">
 </p>
 
-<p align="center">
-  <img src="assets/vis_2.png" alt="Image Description" width="620" height="YOUR_HEIGHT">
-</p>
-<figcaption align = "center"><b>Figure 2: Visualisation Results of SurgicalSAM.
+<figcaption align = "center"><b>Figure 2: Visualisation Results of SurgicalSAM-CLIP.
  </b></figcaption>
 
 ## Installation
@@ -78,6 +75,8 @@ Please find the checkpoint of SAM in `vit_h` version [here](https://dl.fbaipubli
 
 We provide the checkpoint of our trained SurgicalSAM [in the ckp.zip here](https://unisyd-my.sharepoint.com/:f:/g/personal/wenxi_yue_sydney_edu_au/Et9Nz5d4r2BDkDTakggPMFAB11UNIfbUN3PNz71p1XP0Ug).
 
+
+For MedSAM, there are available models here: https://drive.google.com/drive/folders/1ETWmi4AiniJeWOt6HAsYgTjYv_fkgzoN?usp=drive_link
 
 ##  File Organisation
 After downloading the data and model checkpoints and preprocessing the data, the files should be organised as follows.
@@ -168,7 +167,18 @@ python train.py  --dataset endovis_2017  --fold 0
 ```
 
 ## Add CLIP prompts
-
+For training with different CLIP text prompts you can set them directly in the train_clip_full.py. Currently, they are named like:
+```
+instrument_details = [
+    "bipolar forceps have a slim, elongated tweezer-like design with opposing tips, are silver-colored, made from high-quality metal, and feature an insulated shaft for controlled energy application.",
+    "prograsp forceps possess curved scissor-like handles, specialized grasping tips with interlocking jaws, a ratcheting mechanism, and color-coded markings for easy identification during surgery.",
+    "large needle drivers feature elongated handles, sturdy gripping surfaces, a curved or straight jaw tip for securely holding needles, and a locking mechanism to ensure precision and control.",
+    "monopolar curved scissors showcase elongated handles, curved cutting edges for precise dissection, and an insulated shaft, allowing controlled application of electrical energy for cutting and coagulation.",
+    "ultrasound probes feature a long, slender handle, a small transducer head for producing ultrasound waves, and a flexible cable connecting the probe to the ultrasound machine for real-time imaging guidance.",
+    "suction instruments appear as elongated tubes with a narrow, hollow tip for fluid and debris removal, connected to a handle and tubing system for vacuum generation and precise control during the procedure.",
+    "clip appliers feature elongated handles, a shaft with a specialized tip for holding and releasing clips, and a mechanism to advance and deploy the clips precisely for secure tissue or vessel closure.",
+]
+```
 
 
 ##  Inference
@@ -196,4 +206,7 @@ If you find SurgicalSAM helpful, please consider citing:
 
 ##  Acknowledgement
 This project is built upon [Segment Anything](https://github.com/facebookresearch/segment-anything). We thank the authors for their great work.
+
 Thanks to original authors of the git repo https://github.com/wenxi-yue/SurgicalSAM?tab=readme-ov-file .
+
+Thanks as well to the team of MedSAM for their work : https://github.com/bowang-lab/MedSAM
