@@ -3,6 +3,7 @@
 This GIT Repo is a copy with modifications from the original paper https://arxiv.org/pdf/2308.08746v2 sugrical SAM.
 In this repo are tests for adding more generalizability with CLIP text embeddings under the branch clipDev. 
 There are also jupyter notebooks for visualization needs. Thanks to the original author **Wenxi Yue, Jing Zhang, Kun Hu, Yong Xia, Jiebo Luo, Zhiyong Wang** for making their work publicly available.
+Parts have been copied for easier navigation for people with SurgicalSAM expertise. 
 
 
 ## Abstract 
@@ -73,8 +74,8 @@ In SurgicalSAM, `vit_h` is used.
 
 Please find the checkpoint of SAM in `vit_h` version [here](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth). 
 
-We provide the checkpoint of our trained SurgicalSAM [in the ckp.zip here](https://unisyd-my.sharepoint.com/:f:/g/personal/wenxi_yue_sydney_edu_au/Et9Nz5d4r2BDkDTakggPMFAB11UNIfbUN3PNz71p1XP0Ug).
-
+Surigcal-SAM provides the checkpoint of our trained SurgicalSAM [in the ckp.zip here](https://unisyd-my.sharepoint.com/:f:/g/personal/wenxi_yue_sydney_edu_au/Et9Nz5d4r2BDkDTakggPMFAB11UNIfbUN3PNz71p1XP0Ug).
+Surgical-SAM-CLIP checkpoints can be found [here](https://drive.google.com/drive/folders/1dDTxvZGY2-Y3reFC1syQUvt-XBy-fu_Q?usp=sharing). 
 
 For MedSAM, there are available models here: https://drive.google.com/drive/folders/1ETWmi4AiniJeWOt6HAsYgTjYv_fkgzoN?usp=drive_link
 
@@ -188,8 +189,8 @@ cd surgicalSAM/
 python inference.py  --dataset endovis_2018
 python inference.py  --dataset endovis_2017  --fold 0
 ```
-Or for good visualisation of your results using the created Jupyter notebooks:
 
+Or for good visualisation of your results using the created Jupyter notebooks:
 ```
 cd surgicalSAM/Jupyer Notebook Inference etc/
 juptyer-notebook inference_SSAM_clip.ipynb
